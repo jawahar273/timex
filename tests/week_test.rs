@@ -1,53 +1,67 @@
-use chrono::{Days, Timelike, Utc, DateTime, TimeZone, IsoWeek, Duration, Datelike};
+use chrono::{DateTime, Duration, Timelike, Utc};
 use schedule::model::ScheduleDetails;
-use schedule::{schedule_date_times};
-use chrono::prelude::*;
+use schedule::schedule_date_times;
+
+use crate::common::{assert_diff_between_dates_with_repeated_time, get_start_end_date_week, add_repeat_time};
+
+#[path = "./common.rs"]
+mod common;
 
 use serde_json;
 
-fn temp(
-    scheduled_start_date_time: DateTime<Utc>,
-        repeat_every_times: u64,
-) -> DateTime<Utc> {
-    let t = scheduled_start_date_time+ Duration::weeks(repeat_every_times as i64);
+fn temp(scheduled_start_date_time: DateTime<Utc>, repeat_every_times: u64) -> DateTime<Utc> {
+    let t = scheduled_start_date_time + Duration::weeks(repeat_every_times as i64);
 
-    t
-       .with_minute(scheduled_start_date_time.minute()).unwrap()
-       .with_hour(scheduled_start_date_time.hour()).unwrap()
-       .with_second(scheduled_start_date_time.second()).unwrap()
-       .with_nanosecond(0).unwrap()   
+    t.with_minute(scheduled_start_date_time.minute())
+        .unwrap()
+        .with_hour(scheduled_start_date_time.hour())
+        .unwrap()
+        .with_second(scheduled_start_date_time.second())
+        .unwrap()
+        .with_nanosecond(0)
+        .unwrap()
 }
-
 
 #[test]
 fn it_week_never_stop() {
     let sc = r#"
     {
-        "scheduledStartDateTime": "2023-12-14T09:08:44.939Z",
+        "scheduledStartDateTime": "2023-12-10T09:08:44.939Z",
         "repeatEveryNumber": 1,
         "repeatEvery": "week",
         "endOption": "never",
         "weekDaysForRepeatEvery": []
       }
     "#;
-    
-    let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
-    let scheduled_start_date_time = chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time).unwrap().with_timezone(&Utc);
 
+    let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
+
+    let original_schedule =
+        chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
+            .unwrap()
+            .with_timezone(&Utc);
+    let scheduled_start_date_time =
+    add_repeat_time(
+        job_details.repeat_every_number,
+        &original_schedule,
+        &job_details.repeat_every
+     );
+
+    let range_date = get_start_end_date_week();
     let actual = schedule_date_times(
-       &job_details,
-    ).unwrap();
-    
-    let expect = temp(scheduled_start_date_time, job_details.repeat_every_number);
+        &job_details,
+        scheduled_start_date_time,
+        range_date.0,
+        range_date.1,
+    )
+    .unwrap();
 
     dbg!(&actual);
-    
-    assert_eq!(
-        expect,
-        actual[0],
-    )
-}
 
+    assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
+
+    assert_ne!(actual.len(), 0, "every week a date has be produced");
+}
 
 #[test]
 fn it_week_stop_at_occurrence_of_n() {
@@ -57,35 +71,45 @@ fn it_week_stop_at_occurrence_of_n() {
         "repeatEveryNumber": 1,
         "repeatEvery": "week",
         "endOption": "after",
-        "occurrenceValue": 3,
+        "occurrenceValue": 20,
         "weekDaysForRepeatEvery": []
       }
     "#;
-    
-    let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
-    let scheduled_start_date_time = chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time).unwrap().with_timezone(&Utc);
 
+    let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
+    let original_schedule =
+        chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
+            .unwrap()
+            .with_timezone(&Utc);
+    let scheduled_start_date_time =
+    add_repeat_time(
+        job_details.repeat_every_number,
+        &original_schedule,
+        &job_details.repeat_every
+     );
+
+    let range_date = get_start_end_date_week();
     let actual = schedule_date_times(
-       &job_details,
-    ).unwrap();
-    let expect = temp(scheduled_start_date_time, job_details.repeat_every_number);
+        &job_details,
+        scheduled_start_date_time,
+        range_date.0,
+        range_date.1,
+    )
+    .unwrap();
 
     dbg!(&actual);
-    
-    assert_eq!(
-        expect,
-        actual[0],
-    )
-    
+
+    assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
+    // FIX: check why the occurrenceValue is not satisfied
+
+
 }
-
-
 
 #[test]
 fn it_week_occurrence_specific_day_non_stop() {
     let sc = r#"
     {
-        "scheduledStartDateTime": "2023-12-14T09:08:44.939Z",
+        "scheduledStartDateTime": "2023-12-08T09:08:44.939Z",
         "repeatEveryNumber": 2,
         "repeatEvery": "week",
         "endOption": "never",
@@ -97,21 +121,35 @@ fn it_week_occurrence_specific_day_non_stop() {
         ]
       }
     "#;
-    
-    let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
-    let scheduled_start_date_time = chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time).unwrap().with_timezone(&Utc);
 
+    let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
+    let scheduled_start_date_time =
+        chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
+            .unwrap()
+            .with_timezone(&Utc);
+
+    // let scheduled_start_date_time = add_repeat_time(
+    //     job_details.repeat_every_number,
+    //     &original_schedule,
+    //     &job_details.repeat_every
+    //  );
+     dbg!(&scheduled_start_date_time);
+     
+    let range_date = get_start_end_date_week();
     let actual = schedule_date_times(
-       &job_details,
-    ).unwrap();
-    let expect = temp(scheduled_start_date_time, job_details.repeat_every_number);
+        &job_details,
+        scheduled_start_date_time,
+        range_date.0,
+        range_date.1,
+    )
+    .unwrap();
 
     dbg!(&actual);
     dbg!(&actual.len());
-    
-    assert_eq!(
-        expect,
-        actual[0],
-    )
+    assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
 
+    assert_eq!(
+        job_details.week_days_for_repeat_every.unwrap().len() as i64,
+        actual.len() as i64,
+    );
 }

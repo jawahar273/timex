@@ -1,6 +1,4 @@
-use serde::{Serialize, Deserialize};
-
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -29,7 +27,7 @@ pub enum EndOption {
 
     #[serde(rename = "never")]
     Never,
-    
+
     #[serde(rename = "onThe")]
     OnThe,
 }
@@ -45,7 +43,7 @@ impl EndOption {
 }
 
 // Default
-#[derive( Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleDetails {
     pub scheduled_start_date_time: String,
@@ -67,4 +65,3 @@ pub struct ScheduleDetails {
     pub week_day_for_year: Option<String>,
     pub month_with_week_day_for_year: Option<String>,
 }
-
