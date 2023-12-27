@@ -1,25 +1,18 @@
 use crate::{
     errors::ScheduleError,
-    model::{self, DayCategoryFor, EndOption, RepeatEvery, ScheduleDetails, WeekDayForMonth},
-    unstable_get_week_bounded_days_for_given_date,
+    model::{self, EndOption, ScheduleDetails, WeekDayForMonth},
     utils::{check_date_with_given_range, date_diff},
 };
 
-use crate::utils::{
-    get_start_and_last_date_of_month_for_given_date, get_week_bounded_days_for_given_date,
-};
+use crate::utils::
+    get_start_and_last_date_of_month_for_given_date
+;
 
 use anyhow::{bail, Ok, Result};
 use chrono::{
-    offset, DateTime, Datelike, Days, Duration, IsoWeek, Months, NaiveDate, TimeZone, Timelike, Utc,
+    offset, DateTime, Datelike, Months, NaiveDate, TimeZone, Timelike, Utc,
 };
 
-fn has_category(detail: &ScheduleDetails) -> bool {
-    if detail.day_category_for_month.is_some() {
-        return true;
-    }
-    return false;
-}
 
 fn non_stop_repeat_every_time(detail: &ScheduleDetails) -> bool {
     if detail.end_option == EndOption::Never {
@@ -155,7 +148,6 @@ pub fn for_month(
     }
 
     if non_stop_repeat_every_time(detail)
-    //  && !has_category(detail)
     {
         // let diff =  - Utc::now();
         let diff = date_diff(&Utc::now(), &end_date);

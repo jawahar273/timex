@@ -73,7 +73,7 @@ pub fn for_week(
         }
         model::EndOption::Never => end_range_date,
     };
-
+    dbg!(&scheduled_start_date_time);
     let schedule_start = Box::new(scheduled_start_date_time + Duration::weeks(repeat_times as i64));
 
     let is_with_in_range =
@@ -113,28 +113,7 @@ pub fn for_week(
         let num = w.num_days_from_monday() as usize;
         result.push(u[num]);
 
-        // *schedule_start = *schedule_start + Duration::weeks(repeat_times as i64);
     }
-    // for  week_day in 0..week_days_for_repeat_every.len() {
-    //     let w = &week_days_for_repeat_every[week_day].parse::<Weekday>().unwrap();
-    //     let num = w.num_days_from_monday();
-    //     let diff_abs = (Utc::now().weekday().num_days_from_monday() - w.num_days_from_monday()) as i64;
-
-    //     let sr = *schedule_start + Duration::days(
-    //         diff_abs
-    //     );
-
-    //     let y = temp_result(
-    //         sr,
-    //         end_date,
-    //         scheduled_start_date_time,
-    //         repeat_times as i64,
-    //     );
-    //     result.extend(
-    //         y
-    //     );
-
-    // }
 
     Ok(result)
 }

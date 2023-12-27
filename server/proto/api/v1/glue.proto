@@ -1,0 +1,44 @@
+syntax="proto3";
+ 
+package timex;
+
+option go_package = "github.com/jawahar273/timex";
+
+
+
+message ScheduleDetails {
+    string scheduledStartDateTime = 1;
+    string repeatEveryNumber = 2;
+    string repeatEvery = 3;
+    optional string endOption = 4;
+    optional string endDate = 5;
+    optional uint64 occurrenceValue = 6;
+    repeated string weekDaysForRepeatEvery = 7;
+    optional string monthOptions = 8;
+    optional int64 onDayValueForMonth = 9;
+    optional string dayCategoryForMonth = 10;
+    optional string weekDayForMonth = 11;
+    optional string yearOptions = 12;
+    optional string monthWithDayForYear = 13;
+    optional int64 onDayValueForYear = 14;
+    optional string  dayCategoryForYear = 15;
+    optional string weekDayForYear = 16;
+    optional string monthWithWeekDayForYear = 17;
+}
+
+
+message DetailRequest {
+    ScheduleDetails details = 1;
+    string previousScheduledDetail = 2;
+    string rangedStartDate = 3;
+    string rangedEndDate = 4;
+}
+
+message DetailResponse {
+    repeated string scheduledDateTime = 1;
+}
+
+service Machine {
+    rpc Send (DetailRequest) returns (DetailResponse) {};
+    rpc SendTest (DetailResponse) returns (DetailResponse) {};
+}

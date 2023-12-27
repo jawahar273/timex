@@ -3,8 +3,8 @@ use crate::common::{
 };
 use chrono::{DateTime, Utc};
 use common::add_repeat_time;
-use schedule::model::ScheduleDetails;
-use schedule::schedule_date_times;
+use timex_core::model::ScheduleDetails;
+use timex_core::schedule_date_times;
 
 #[path = "./common.rs"]
 mod common;
@@ -197,3 +197,6 @@ fn it_n_month_on_n_day_non_stop() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
 }
+
+// TODO: add test case for start and range on month
+// TODO: add test case for occurrences on month

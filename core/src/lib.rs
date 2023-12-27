@@ -22,8 +22,10 @@ use anyhow::Result;
 use chrono::{DateTime, Utc};
 
 use days::for_days;
-use model::ScheduleDetails;
 
+
+use wasm_bindgen::{*, prelude::wasm_bindgen};
+use model::ScheduleDetails;
 use weeks::for_week;
 use months::for_month;
 
@@ -101,4 +103,53 @@ pub fn schedule_date_times(
         start_range_date,
         end_range_date,
     );
+}
+
+
+#[wasm_bindgen]
+// #[no_marg]
+pub fn find_schedule_date_time(
+    detail: &ScheduleDetails,
+    previous_scheduled_date: String,
+    start_range_date: String,
+    end_range_date: String,
+) -> std::result::Result<Vec<String>, JsValue> {
+    
+    let mut _previous_scheduled_date : DateTime<Utc>;
+        
+     match DateTime::parse_from_rfc3339(&previous_scheduled_date) {
+        Ok(v) =>  _previous_scheduled_date = v.with_timezone(&Utc),
+        Err(e) => {
+            return Err(e.to_string().into())
+        },
+    }; 
+
+    let mut  _start_range_date: DateTime<Utc>;
+        
+     match DateTime::parse_from_rfc3339(&start_range_date) {
+        Ok(v) => _start_range_date = v.with_timezone(&Utc),
+        Err(e) => {
+            return Err(e.to_string().into())
+        },
+    };
+    
+    let mut _end_range_date: DateTime<Utc>;
+
+    match DateTime::parse_from_rfc3339(&end_range_date) {
+        Ok(v) => _end_range_date = v.with_timezone(&Utc),
+        Err(e) => {
+            return Err(e.to_string().into())
+        },
+    };
+    
+    let t = generate_schedule_date_time(
+        detail,
+        _previous_scheduled_date,
+        _start_range_date,
+        _end_range_date,
+    );
+    match t {
+        Ok(v) => Ok(v.into_iter().map(|x| x.to_rfc3339()).collect::<Vec<_>>()),
+        Err(e) => Err(e.to_string().into()),
+    }
 }
