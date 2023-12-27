@@ -1,11 +1,11 @@
-use crate::utils::{check_date_with_given_range, concat_date};
+use crate::utils::{check_date_with_given_range, concat_time};
 use crate::{
-    get_week_bounded_days_for_given_date,
     model::{self, ScheduleDetails},
+    utils::get_week_bounded_days_for_given_date,
 };
 use anyhow::{Ok, Result};
 use chrono::{
-    offset, DateTime, Datelike, Days, Duration, IsoWeek, NaiveDate, TimeZone, Timelike, Utc,
+    offset, DateTime, Duration, Utc,
     Weekday,
 };
 
@@ -22,7 +22,7 @@ fn temp_result(
     let mut temp: Vec<DateTime<Utc>> = vec![];
 
     for _ in 0..num_of_diff {
-        temp.push(concat_date(
+        temp.push(concat_time(
             schedule_start,
             original_scheduled_start_date_time,
         ));
@@ -31,7 +31,7 @@ fn temp_result(
         schedule_start = schedule_start + Duration::weeks(repeat_times as i64);
     }
 
-    temp.push(concat_date(
+    temp.push(concat_time(
         schedule_start,
         original_scheduled_start_date_time,
     ));
@@ -50,7 +50,6 @@ pub fn for_week(
 
     let end_date: DateTime<Utc> = match detail.end_option {
         model::EndOption::After => {
-            // TODO: confirm this logic works or not
             // let t = offset::Utc::now().checked_add_days(IsoWeek::new(detail.occurrence_value.unwrap().try_into()?)).unwrap();
             let possible_date =
                 offset::Utc::now() + Duration::weeks(detail.occurrence_value.unwrap().try_into()?);

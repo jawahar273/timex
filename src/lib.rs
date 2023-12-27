@@ -1,3 +1,21 @@
+//! # Schedule Time Generator
+//! 
+
+//! Generate range of schedule date and time based on the
+//! parameter provided.
+//! 
+//! ## Feature:
+//! - frequency
+//! - Time range
+//! - Occurrence
+//! - Based on daily, weekly, monthly(WIP) and yearly(soon)..
+//! 
+//! 
+//! ## Limitation
+//! - Not good with nano second as this project rely on ([`Chrono`](https://docs.rs/chrono/latest/chrono/index.html#limitations)) which has know limitation.
+//! - Recommenced to use a persistance database to store the schedule date and time.
+//! 
+
 use log::debug;
 
 use anyhow::Result;
@@ -7,15 +25,19 @@ use days::for_days;
 use model::ScheduleDetails;
 
 use weeks::for_week;
+use months::for_month;
 
 pub mod errors;
 pub mod model;
 pub use self::utils::{
-    get_start_and_last_date_of_month_for_given_date, get_week_bounded_days_for_given_date,
+    get_start_and_last_date_of_month_for_given_date as unstable_get_start_and_last_date_of_month_for_given_date,
+    get_week_bounded_days_for_given_date as unstable_get_week_bounded_days_for_given_date,
+    date_diff,
 };
 mod days;
 mod utils;
 mod weeks;
+mod months;
 
 fn generate_schedule_date_time(
     detail: &ScheduleDetails,
@@ -50,7 +72,14 @@ fn generate_schedule_date_time(
                 Some(true),
             )
         }
-        model::RepeatEvery::Month => todo!(),
+        model::RepeatEvery::Month => {
+            for_month(
+                detail,
+                previous_scheduled_date,
+                start_range_date,
+                end_range_date,
+            )
+        },
         model::RepeatEvery::Year => todo!(),
     }
 }

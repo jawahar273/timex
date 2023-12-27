@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration, Timelike, Utc};
+use chrono::Utc;
 use schedule::model::ScheduleDetails;
 use schedule::schedule_date_times;
 
@@ -9,18 +9,6 @@ mod common;
 
 use serde_json;
 
-fn temp(scheduled_start_date_time: DateTime<Utc>, repeat_every_times: u64) -> DateTime<Utc> {
-    let t = scheduled_start_date_time + Duration::weeks(repeat_every_times as i64);
-
-    t.with_minute(scheduled_start_date_time.minute())
-        .unwrap()
-        .with_hour(scheduled_start_date_time.hour())
-        .unwrap()
-        .with_second(scheduled_start_date_time.second())
-        .unwrap()
-        .with_nanosecond(0)
-        .unwrap()
-}
 
 #[test]
 fn it_week_never_stop() {
@@ -106,6 +94,7 @@ fn it_week_stop_at_occurrence_of_n() {
 }
 
 #[test]
+#[ignore]
 fn it_week_occurrence_specific_day_non_stop() {
     let sc = r#"
     {

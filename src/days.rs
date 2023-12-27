@@ -1,8 +1,6 @@
-use std::cmp::Ordering;
 
 use anyhow::{bail, Result};
 use chrono::{offset, DateTime, Datelike, Days, TimeZone, Timelike, Utc};
-use serde::de;
 
 use crate::errors::ScheduleError;
 use crate::model::{self, ScheduleDetails};
@@ -20,7 +18,6 @@ pub fn for_days(
         bail!(ScheduleError::DaysWithMoreThan31AreNotAllowed());
     }
 
-    // FIX: check the start date greater than today
     let mut schedule_start = scheduled_start_date_time + Days::new(repeat_times.try_into()?);
 
     // today compare with old date is "greater"
@@ -49,11 +46,10 @@ pub fn for_days(
 
     let end_date: DateTime<Utc> = match detail.end_option {
         model::EndOption::After => {
-            // TODO: confirm this logic works or not
             let possible_date: DateTime<Utc> = offset::Utc::now()
                 .checked_add_days(Days::new(detail.occurrence_value.unwrap().try_into()?))
                 .unwrap();
-
+                
             let result =
                 check_date_with_given_range(&possible_date, &start_range_date, &end_range_date);
 

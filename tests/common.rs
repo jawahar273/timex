@@ -1,9 +1,9 @@
-use chrono::{DateTime, Duration, Utc, Days};
+use chrono::{DateTime, Duration, Utc, Days, Months};
 use schedule::{
-    get_week_bounded_days_for_given_date,
-    model::{RepeatEvery, ScheduleDetails},
+    unstable_get_week_bounded_days_for_given_date as get_week_bounded_days_for_given_date,
+    model::{RepeatEvery, ScheduleDetails},  
+    unstable_get_start_and_last_date_of_month_for_given_date as get_start_and_last_date_of_month_for_given_date, date_diff,
 };
-
 
 
 pub fn get_start_end_date_week() -> (DateTime<Utc>, DateTime<Utc>) {
@@ -15,17 +15,37 @@ pub fn get_start_end_date_week() -> (DateTime<Utc>, DateTime<Utc>) {
     return (start_range_date, end_range_date);
 }
 
+
+pub fn get_start_end_date_month() -> (DateTime<Utc>, DateTime<Utc>) {
+    let a = get_start_and_last_date_of_month_for_given_date(&Utc::now());
+    let b = get_start_and_last_date_of_month_for_given_date(&(a.1 + Days::new(1)));
+    let c = get_start_and_last_date_of_month_for_given_date(&(b.1 + Days::new(1)));
+    let d = get_start_and_last_date_of_month_for_given_date(&(c.1 + Days::new(1)));
+    let e = get_start_and_last_date_of_month_for_given_date(&(d.1 + Days::new(1)));
+    
+    dbg!(&d.0);
+    dbg!(&d.1);
+    
+    (
+        a.0,
+        e.1
+    )
+}
+
 pub fn num_of_diff(
     diff_duration: &Duration,
     repeat_every: &RepeatEvery,
-    _previous_scheduled_start: &DateTime<Utc>,
+    previous_scheduled_start: &DateTime<Utc>,
 ) -> i64 {
     match repeat_every {
         RepeatEvery::Day => diff_duration.num_days(),
         RepeatEvery::Week => diff_duration.num_weeks(),
         // FIX: confirm month
         RepeatEvery::Month => {
-            todo!();
+            date_diff(
+                previous_scheduled_start,
+                &Utc::now(),
+            ).months
             //    (previous_scheduled_start.month() - _date.month()) as i64
         }
         RepeatEvery::Year => {
@@ -77,7 +97,9 @@ pub fn add_repeat_time(
         RepeatEvery::Week => {
             Utc::now() - Duration::weeks((r.num_weeks() / (repeat_time as i64)).try_into().unwrap())
         },
-        RepeatEvery::Month => todo!(),
+        RepeatEvery::Month => {
+            Utc::now() - Months::new(repeat_time.try_into().unwrap())
+        },
         RepeatEvery::Year => todo!(),
     }
 }

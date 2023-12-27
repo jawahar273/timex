@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use chrono::{
-    DateTime, Datelike, Days, NaiveDate, NaiveDateTime, TimeZone, Timelike, Utc, Weekday,
+    DateTime, Datelike, Days, NaiveDate, TimeZone, Timelike, Utc, Weekday,
 };
 
 // today compare with old date is "greater"
@@ -77,8 +77,34 @@ pub fn get_week_bounded_days_for_given_date(date: &DateTime<Utc>) -> Vec<DateTim
     result
 }
 
+
+pub fn get_start_and_last_date_of_week_for_given_date(
+    date: &DateTime<Utc>,
+) -> (DateTime<Utc>, DateTime<Utc>) {
+    let year = date.year();
+    let week_number = date.iso_week().week();
+    let start = NaiveDate::from_isoywd_opt(year, week_number, Weekday::try_from(0).unwrap())
+    .unwrap()
+    .and_hms_nano_opt(0, 0, 0, 0)
+    .unwrap()
+    .and_utc();
+
+    let end = NaiveDate::from_isoywd_opt(year, week_number, Weekday::try_from(6).unwrap())
+    .unwrap()
+    .and_hms_nano_opt(0, 0, 0, 0)
+    .unwrap()
+    .and_utc();
+
+    return (
+        start,
+        end,
+    )
+    
+}
+    
+
 // nano second are not able to copy
-pub fn concat_date(
+pub fn concat_time(
     schedule_start: DateTime<Utc>,
     original_scheduled_start_date_time: DateTime<Utc>,
 ) -> DateTime<Utc> {
@@ -91,8 +117,35 @@ pub fn concat_date(
         original_scheduled_start_date_time.second(),
     )
     .unwrap()
-    .with_timezone(&Utc)
 }
+#[derive(Debug)]
+pub struct DateDiff {
+    pub years: i64,
+    pub months: i64,
+    pub days: i64,
+}
+
+
+pub fn date_diff(start: &DateTime<Utc>, end: &DateTime<Utc>) -> DateDiff { 
+
+    // let start =
+    //     DateTime::<Utc>::from_utc(chrono::NaiveDate::parse_from_str(date_string, "%d/%m/%Y")
+    //         .unwrap()
+    //         .and_hms(0, 0, 0), Utc);
+
+    let diff = end.signed_duration_since(start);
+    let days = diff.num_days();
+    let years = days / 365;
+    let remaining_days = days % 365;
+    let months = remaining_days / 30;
+    let days = remaining_days % 30;
+    
+    DateDiff {
+        days,
+        years,
+        months,
+    }
+}   
 
 #[cfg(test)]
 mod test {
@@ -130,7 +183,7 @@ mod test {
         let expect = DateTime::parse_from_rfc3339("2023-12-21T14:08:15.0Z")
             .unwrap()
             .with_timezone(&Utc);
-        let actual = concat_date(
+        let actual = concat_time(
             DateTime::parse_from_rfc3339("2023-12-21T14:08:15.223Z")
                 .unwrap()
                 .with_timezone(&Utc),
