@@ -1,7 +1,7 @@
 use crate::common::{
     assert_diff_between_dates_with_repeated_time, get_start_end_date_month, num_of_diff,
 };
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use common::add_repeat_time;
 use timex_core::model::ScheduleDetails;
 use timex_core::schedule_date_times;
@@ -37,6 +37,7 @@ fn it_month_non_stop() {
     let range_date = get_start_end_date_month();
     dbg!(&range_date.0);
     dbg!(&range_date.1);
+    dbg!(format!("{job_details}"));
 
     let actual = schedule_date_times(
         &job_details,
@@ -91,6 +92,7 @@ fn it_month_first_monday_non_stop() {
         &original_schedule,
         &job_details.repeat_every,
     );
+    dbg!(format!("{job_details}"));
 
     let range_date = get_start_end_date_month();
     dbg!(&range_date.0);

@@ -75,6 +75,8 @@ fn it_week_stop_at_occurrence_of_n() {
         &original_schedule,
         &job_details.repeat_every
      );
+    dbg!(format!("{job_details}"));
+     
 
     let range_date = get_start_end_date_week();
     let actual = schedule_date_times(
@@ -94,7 +96,7 @@ fn it_week_stop_at_occurrence_of_n() {
 }
 
 #[test]
-#[ignore]
+#[ignore] // TODO: find better test for find weekdays.
 fn it_week_occurrence_specific_day_non_stop() {
     let sc = r#"
     {
@@ -116,13 +118,14 @@ fn it_week_occurrence_specific_day_non_stop() {
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
             .unwrap()
             .with_timezone(&Utc);
-
+        dbg!(format!("{job_details}"));
+    
     // let scheduled_start_date_time = add_repeat_time(
     //     job_details.repeat_every_number,
     //     &original_schedule,
     //     &job_details.repeat_every
     //  );
-     dbg!(&scheduled_start_date_time);
+
      
     let range_date = get_start_end_date_week();
     let actual = schedule_date_times(

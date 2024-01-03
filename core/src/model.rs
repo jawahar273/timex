@@ -4,8 +4,10 @@ use chrono::Weekday;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 
+
+
 #[wasm_bindgen]
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub enum RepeatEvery {
     Day,
@@ -14,17 +16,62 @@ pub enum RepeatEvery {
     Year,
 }
 
+
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub enum MonthOptions {
+    #[serde(rename = "onThe")]
+    OnThe,
+    
+    #[serde(rename = "onDay")]
+    OnDay,
+}
+
+impl MonthOptions {
+    pub fn from(value: String) -> Self {
+        match value.as_str() {            
+            "onDay"  => Self::OnDay,
+            "onThe"  => Self::OnThe,
+            _ => {
+                panic!("unexpected option")
+            }
+        }
+    }   
+
+    pub fn to_string(&self) -> String {
+        match self {
+            Self::OnDay => "onDay".to_string(),
+            Self::OnThe => "onThe".to_string(),
+        }
+    }
+}
+
 // #[wasm_bindgen]
-// impl RepeatEvery {
-//     pub fn to_string(&self) -> String {
-//         match self {
-//             RepeatEvery::Day => "day".to_string(),
-//             RepeatEvery::Month => "month".to_string(),
-//             RepeatEvery::Week => "week".to_string(),
-//             RepeatEvery::Year => "year".to_string(),
-//         }
-//     }
-// }
+impl RepeatEvery {
+    
+    pub fn from(value: String) -> Self {
+        match value.as_str() {            
+            "day"  => RepeatEvery::Day,
+            "month"  => RepeatEvery::Month,
+            "week" => RepeatEvery::Week,
+            "year" =>  RepeatEvery::Year,
+            _ => {
+                panic!("unexpected option")
+            }
+        }
+    }   
+
+    pub fn to_string(&self) -> String {
+        match self {
+            RepeatEvery::Day => "day".to_string(),
+            RepeatEvery::Month => "month".to_string(),
+            RepeatEvery::Week => "week".to_string(),
+            RepeatEvery::Year => "year".to_string(),
+        }
+    }
+}
 
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Copy)]
@@ -39,16 +86,28 @@ pub enum EndOption {
     OnThe,
 }
 
-// #[wasm_bindgen]
-// impl EndOption {
-//     pub fn to_string(&self) -> String {
-//         match self {
-//             EndOption::After => "after".to_string(),
-//             EndOption::Never => "never".to_string(),
-//             EndOption::OnThe => "onThe".to_string(),
-//         }
-//     }
-// }
+
+impl EndOption {
+    
+    pub fn from(value: String) -> Self {
+        match value.as_str() {            
+            "after"  => Self::After,
+            "never"  => Self::Never,
+            "onThe" => Self::OnThe,
+            _ => {
+                panic!("unexpected option")
+            }
+        }
+    }
+    
+    pub fn to_string(&self) -> String {
+        match self {
+            EndOption::After => "after".to_string(),
+            EndOption::Never => "never".to_string(),
+            EndOption::OnThe => "onThe".to_string(),
+        }
+    }
+}
 
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Copy)]
@@ -70,6 +129,33 @@ pub enum DayCategoryFor {
 }
 
 impl  DayCategoryFor {
+    
+    pub fn from(value: String) -> Self {
+        match value.as_str() {            
+            "first"  => Self::First,
+            "second"  => Self::Second,
+            "third"  => Self::Third,
+            "fourth"  => Self::Fourth,
+            "last"  => Self::Last,
+            _ => {
+                panic!("unexpected option")
+            }
+        }
+    }
+    
+    pub fn to_string(&self) -> String {
+        match self {            
+            Self::First => "first".to_string(),
+            Self::Second =>"second".to_string(),
+           Self::Third =>"third".to_string(),
+            Self::Fourth =>"fourth".to_string(),
+                           Self::Last => "last".to_string(),
+            _ => {
+                panic!("unexpected option")
+            }
+        }
+    }
+    
     pub fn to_week_in_month(&self) -> i32 {
         match self {
             Self::First => 0,
@@ -113,6 +199,22 @@ impl fmt::Display for WeekDayForMonth {
 }
 
 impl WeekDayForMonth {
+    
+    pub fn from(value: String) -> Self {
+        match value.as_str() {            
+            "monday"  => Self::Monday,
+            "tuesday"  => Self::Tuesday,
+            "wednesday"  => Self::Wednesday,
+            "thursday"  => Self::Thursday,
+            "friday"  => Self::Friday,
+            "saturday"  => Self::Saturday,
+            "sunday"  => Self::Sunday,
+            _ => {
+                panic!("unexpected option")
+            }
+        }
+    }
+    
     pub fn to_chrono(&self) -> Weekday {
         match self {
            Self::Monday =>  Weekday::Mon,
@@ -153,7 +255,7 @@ pub struct ScheduleDetails {
     pub week_days_for_repeat_every: Option<Vec<String>>,
     
     #[serde(rename = "monthOptions")]
-    pub month_options: Option<String>,
+    pub month_options: Option<MonthOptions>,
 
     #[serde(rename = "onDayValueForMonth")]
     pub on_day_value_for_month: Option<i64>,
@@ -181,4 +283,48 @@ pub struct ScheduleDetails {
 
     #[serde(rename = "monthWithWeekDayForYear")]
     pub month_with_week_day_for_year: Option<String>,
+}
+
+impl fmt::Display for ScheduleDetails {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        
+        let mut every: String;
+        
+        if self.repeat_every == RepeatEvery::Week {
+            let week_days_for_repeat_every = self.week_days_for_repeat_every.clone().unwrap();
+            every = format!("{} {}", self.repeat_every_number, self.repeat_every.to_string());
+            if week_days_for_repeat_every.len() >= 2 {
+            every = format!("{} and {}", 
+                week_days_for_repeat_every[0..week_days_for_repeat_every.len()-2].join(", "),
+                week_days_for_repeat_every[week_days_for_repeat_every.len()-1]
+            );
+            } else if week_days_for_repeat_every.len() == 1 {
+                every = format!("{}", week_days_for_repeat_every[0]);
+            }
+        } else if self.repeat_every == RepeatEvery::Month {
+            every = format!("{} {}", self.repeat_every_number, self.repeat_every.to_string());
+            if self.month_options.is_some() && self.month_options.unwrap() == MonthOptions::OnThe {
+                every = format!("{} on {} {}", 
+                    every,
+                    self.day_category_for_month.unwrap().to_string(),
+                    self.week_day_for_month.unwrap().to_string(),
+                );
+            }
+        } else if self.repeat_every == RepeatEvery::Year {
+            todo!("yet to implement year logic");
+        } else if self.repeat_every_number >= 2{
+            every = format!("{} {}", self.repeat_every_number, self.repeat_every.to_string());
+        } else {
+            every = format!("{}", self.repeat_every.to_string());
+        }
+
+        let start: String = format!("starting {}", self.scheduled_start_date_time);
+        
+        let mut end: String = "".to_string();
+        if self.end_date.is_some() {
+            end = format!("until {}", &self.end_date.clone().unwrap());
+        }
+        
+        write!(f, "occurs every {every} {start} {end}")
+    }
 }

@@ -141,7 +141,9 @@ fn it_daily_stop_n_occurrence() {
     }
    "#;
     let job_details: ScheduleDetails = serde_json::from_str(&t).unwrap();
-
+    
+    dbg!(format!("{job_details}"));
+    
     let original_schedule =
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
             .unwrap()
