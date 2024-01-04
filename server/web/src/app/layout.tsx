@@ -5,10 +5,10 @@ import { Inter as FontSans } from "next/font/google"
  
 import { cn } from "@timex/utils"
  
-export const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+// export const fontSans = FontSans({
+//   subsets: ["latin"],
+//   variable: "--font-sans",
+// })
  
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          // fontSans.variable
         )}>{children}</body>
     </html>
   )

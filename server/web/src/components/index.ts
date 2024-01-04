@@ -1,1 +1,1 @@
-export { Date } from './date'
+export * from './date'

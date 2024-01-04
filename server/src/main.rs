@@ -1,8 +1,8 @@
 use chrono::{Utc, DateTime};
 use serde::Serialize;
 use serde_json::{self, Value, json};
-use timex_core::schedule_date_times;
-use timex_core::model::ScheduleDetails;
+use timex_core::{schedule_date_times, model::RepeatEvery};
+use timex_core::model::{ScheduleDetails as TScheduleDetails, EndOption, DayCategoryFor, WeekDayForMonth, MonthOptions};
 use tonic_health::server::HealthReporter;
 use std::{fmt, net::SocketAddr, time::Duration};
 
@@ -34,7 +34,7 @@ async fn core_call() {
        "endOption": "never"
      }
     "#;
-     let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
+     let job_details: TScheduleDetails = serde_json::from_str(sc).unwrap();
      let temp = schedule_date_times(
          &job_details,
          DateTime::parse_from_rfc3339("2023-12-26T15:01:21.214570Z").unwrap().with_timezone(&Utc),
@@ -113,9 +113,56 @@ async fn shutdown() {
 }
 
 
-// impl proto::ScheduleDetails {
-//     to_sered
-// }
+impl proto::ScheduleDetails {
+    fn to_sered(&self) -> TScheduleDetails {
+        
+        let pr = self.clone();
+        
+        let repeat_every = RepeatEvery::from(pr.repeat_every);
+        let end_option = EndOption::from(pr.end_option.expect("wrong option for end options"));
+        let week_days_for_repeat_every = Some(pr.week_days_for_repeat_every);
+        let day_category_for_month = match pr.day_category_for_month {
+            Some(v) => {
+                Some(DayCategoryFor::from(v))
+            }
+            None => None,
+        };
+        let week_day_for_month = match pr.week_day_for_month {
+            Some(v) => {      
+                dbg!(&v);
+                Some(WeekDayForMonth::from(v))
+            }
+            None => None,
+        };
+
+        let month_options: Option<MonthOptions> = match  pr.month_options {
+            Some(v) => {
+                Some(MonthOptions::from(v))
+            }
+            None => None
+        };
+        
+        return TScheduleDetails {
+            scheduled_start_date_time: pr.scheduled_start_date_time,
+            repeat_every_number: pr.repeat_every_number,
+            repeat_every,
+            end_option: end_option,
+            end_date: pr.end_date,
+            occurrence_value: pr.occurrence_value,
+            week_days_for_repeat_every: week_days_for_repeat_every,
+            month_options: month_options,
+            on_day_value_for_month: pr.on_day_value_for_month,
+            day_category_for_month: day_category_for_month,
+            week_day_for_month: week_day_for_month,
+            year_options: pr.year_options,
+            month_with_day_for_year: pr.month_with_day_for_year,
+            on_day_value_for_year: pr.on_day_value_for_year,
+            day_category_for_year: pr.day_category_for_year,
+            week_day_for_year: pr.week_day_for_year,
+            month_with_week_day_for_year: pr.month_with_week_day_for_year,
+        }
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct Service {}
@@ -126,34 +173,55 @@ impl Timex for Service {
 
         let y= request.into_inner();
         
-       let details = y.details.expect("schedule details is required");
+        let details = y.details.expect("schedule details is required");
+         
+        let previous_scheduled_detail = chrono::DateTime::parse_from_rfc3339(
+            &y.previous_scheduled_detail
+        ).expect("previous scheduled date error")
+        .with_timezone(&Utc);
+    
+    
+    let ranged_start_date = chrono::DateTime::parse_from_rfc3339(
+        &y.ranged_start_date
+    ).expect("start range date error")
+    .with_timezone(&Utc);
+
+    let ranged_end_date = chrono::DateTime::parse_from_rfc3339(
+        &y.ranged_end_date
+    ).expect("end range date error")
+    .with_timezone(&Utc);
+dbg!(&y.previous_scheduled_detail);
         
         let sch = schedule_date_times(
-            &details,
-            y.previous_scheduled_detail,
-            y.ranged_start_date,
-            y.ranged_end_date,
-         );
- 
-        Ok(
-            Response::new(
-                DetailResponse{
-                    scheduled_date_time: sch,
-                }   
-            )
-        )
+            &details.to_sered(),
+            previous_scheduled_detail,
+            ranged_start_date,
+            ranged_end_date,
+         ); 
+
+        match sch {
+             Ok(v) => {
+                Ok(
+                    Response::new(
+                        DetailResponse{
+                            scheduled_date_time: v.iter().map(|t| t.to_rfc3339()).collect(),
+                        }   
+                    )
+                )
+             },
+             Err(e) => {
+                    Err(
+                        Status::new(
+                            tonic::Code::Internal,
+                            e.to_string(),
+                        )
+                    )
+             }
+         }
+
     }
     
     async fn send_test(&self, request: Request<DetailResponse>) -> TimexResult<DetailResponse> {
-        let mut t: Vec<String> = Vec::new();
-        t.push("jklfdsjsk".to_string());
-        
-        Ok(
-            Response::new(
-                DetailResponse{
-                    scheduled_date_time: t
-                }   
-            )
-        )
+        return  Err(Status::aborted("testing error"));
     }
 }

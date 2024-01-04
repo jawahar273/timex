@@ -8,7 +8,7 @@ option go_package = "github.com/jawahar273/timex";
 
 message ScheduleDetails {
     string scheduledStartDateTime = 1;
-    string repeatEveryNumber = 2;
+    uint64 repeatEveryNumber = 2;
     string repeatEvery = 3;
     optional string endOption = 4;
     optional string endDate = 5;

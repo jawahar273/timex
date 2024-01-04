@@ -24,6 +24,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	internal "github.com/jawahar273/timex/internal"
 	pbV1 "github.com/jawahar273/timex/proto/api/v1"
 )
 
@@ -94,6 +95,8 @@ func main() {
 		ctx.Header("Content-Type", "application/json")
 	})
 
+	apiV1 := router.Group("/api/v1")
+
 	router.GET("/api/healthz", func(c *gin.Context) {
 
 		var status = successful
@@ -141,11 +144,14 @@ func main() {
 		// pbV1.send
 
 		if err != nil {
-			log.Fatal().Msgf("listen: %s\n", err)
+			log.Fatal().Msgf("grpc listen: %s\n", err)
 		}
 
 		c := pbV1.NewMachineClient(grpcConn)
-		fmt.Println(c.SendTest(context.TODO(), &pbV1.DetailResponse{ScheduledDateTime: []string{"dfdf"}}))
+		internal.SetupRoutesV1(
+			apiV1,
+			c,
+		)
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Msgf("listen: %s\n", err)

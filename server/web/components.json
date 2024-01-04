@@ -11,7 +11,7 @@
     "prefix": ""
   },
   "aliases": {
-    "components": "@timex/src/components",
-    "utils": "@timex/src/utils"
+    "components": "@timex/components",
+    "utils": "@timex/utils"
   }
 }
