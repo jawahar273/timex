@@ -1,8 +1,8 @@
 use chrono::{Utc, DateTime};
 use serde::Serialize;
 use serde_json::{self, Value, json};
-use timex_core::{schedule_date_times, model::RepeatEvery};
-use timex_core::model::{ScheduleDetails as TScheduleDetails, EndOption, DayCategoryFor, WeekDayForMonth, MonthOptions};
+use timex::{schedule_date_times, model::RepeatEvery};
+use timex::model::{ScheduleDetails as TScheduleDetails, EndOption, DayCategoryFor, WeekDayForMonth, MonthOptions};
 use tonic_health::server::HealthReporter;
 use std::{fmt, net::SocketAddr, time::Duration};
 

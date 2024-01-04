@@ -5,8 +5,8 @@ use crate::common::{
 };
 use chrono::{DateTime, Days, Timelike, Utc, Duration};
 use common::add_repeat_time;
-use timex_core::model::ScheduleDetails;
-use timex_core::schedule_date_times;
+use timex::model::ScheduleDetails;
+use timex::schedule_date_times;
 
 #[path = "./common.rs"]
 mod common;

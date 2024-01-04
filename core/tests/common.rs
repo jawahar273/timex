@@ -1,5 +1,5 @@
 use chrono::{DateTime, Days, Duration, Months, Utc};
-use timex_core::{
+use timex::{
     date_diff,
     model::{RepeatEvery, ScheduleDetails},
     unstable_get_start_and_last_date_of_month_for_given_date as get_start_and_last_date_of_month_for_given_date,

@@ -1,6 +1,6 @@
 use chrono::Utc;
-use timex_core::model::ScheduleDetails;
-use timex_core::schedule_date_times;
+use timex::model::ScheduleDetails;
+use timex::schedule_date_times;
 
 use crate::common::{assert_diff_between_dates_with_repeated_time, get_start_end_date_week, add_repeat_time};
 
