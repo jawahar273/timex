@@ -47,7 +47,6 @@ fn generate_schedule_date_time(
     start_range_date: DateTime<Utc>,
     end_range_date: DateTime<Utc>,
 ) -> Result<Vec<DateTime<Utc>>> {
-    dbg!(previous_scheduled_date);
     match detail.repeat_every {
         model::RepeatEvery::Day => for_days(
             detail,
