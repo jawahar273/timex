@@ -16,8 +16,6 @@
 //! - Recommenced to use a persistance database to store the schedule date and time.
 //! 
 
-use log::debug;
-
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 
@@ -28,6 +26,8 @@ use wasm_bindgen::{*, prelude::wasm_bindgen};
 use model::ScheduleDetails;
 use weeks::for_week;
 use months::for_month;
+use log::{debug, error, log_enabled, info, Level};
+
 
 pub mod errors;
 pub mod model;
@@ -40,6 +40,8 @@ mod days;
 mod utils;
 mod weeks;
 mod months;
+
+
 
 fn generate_schedule_date_time(
     detail: &ScheduleDetails,

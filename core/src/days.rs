@@ -20,30 +20,6 @@ pub fn for_days(
 
     let mut schedule_start = scheduled_start_date_time + Days::new(repeat_times.try_into()?);
 
-    // today compare with old date is "greater"
-    // today compare with future date is "less"
-    // match today.cmp(&scheduled_start_date_time) {
-    //     Ordering::Less => {
-    //         println!("less");
-    //         schedule_start = start_range_date.checked_add_days(
-    //             Days::new(repeat_times.try_into()?)
-    //         ).unwrap();
-    //     },
-    //     Ordering::Greater => {
-    //         println!("greater");
-    //         // skip to the date on to start
-    //         schedule_start = start_range_date.checked_add_days(
-    //             Days::new(repeat_times.try_into()?)
-    //         ).unwrap();
-    //     },
-    //     Ordering::Equal => {
-    //         println!("equal");
-    //         schedule_start = scheduled_start_date_time.checked_add_days(
-    //             Days::new(repeat_times.try_into()?)
-    //         ).unwrap();
-    //     }
-    // }
-
     let end_date: DateTime<Utc> = match detail.end_option {
         model::EndOption::After => {
             let possible_date: DateTime<Utc> = offset::Utc::now()

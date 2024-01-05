@@ -4,16 +4,29 @@ use chrono::{
     DateTime, Datelike, Days, NaiveDate, TimeZone, Timelike, Utc, Weekday,
 };
 
+
+
+fn convertUTCDateTimeToDateWithZeroHMS(
+    date: &DateTime<Utc>,
+    
+) -> DateTime<Utc> {
+    Utc
+        .with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
+        .unwrap()
+}
+
 // today compare with old date is "greater"
 // today compare with future date is "less"
 
 // Confirm the given date is present between the date ranges
 pub fn check_date_with_given_range(
     date: &DateTime<Utc>,
-    start: &DateTime<Utc>,
-    end: &DateTime<Utc>,
+    _start: &DateTime<Utc>,
+    _end: &DateTime<Utc>,
 ) -> bool {
-    let diff = *end - *start;
+    let start = convertUTCDateTimeToDateWithZeroHMS(_start);
+    let end = convertUTCDateTimeToDateWithZeroHMS(_end);
+    let diff = end - start;
     let y = Utc
         .with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
         .unwrap();
