@@ -1,17 +1,9 @@
 use std::cmp::Ordering;
 
-use chrono::{
-    DateTime, Datelike, Days, NaiveDate, TimeZone, Timelike, Utc, Weekday,
-};
+use chrono::{DateTime, Datelike, Days, NaiveDate, TimeZone, Timelike, Utc, Weekday};
 
-
-
-fn convertUTCDateTimeToDateWithZeroHMS(
-    date: &DateTime<Utc>,
-    
-) -> DateTime<Utc> {
-    Utc
-        .with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
+fn convert_utc_date_time_to_date_with_zero_hms(date: &DateTime<Utc>) -> DateTime<Utc> {
+    Utc.with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
         .unwrap()
 }
 
@@ -24,8 +16,8 @@ pub fn check_date_with_given_range(
     _start: &DateTime<Utc>,
     _end: &DateTime<Utc>,
 ) -> bool {
-    let start = convertUTCDateTimeToDateWithZeroHMS(_start);
-    let end = convertUTCDateTimeToDateWithZeroHMS(_end);
+    let start = convert_utc_date_time_to_date_with_zero_hms(_start);
+    let end = convert_utc_date_time_to_date_with_zero_hms(_end);
     let diff = end - start;
     let y = Utc
         .with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
@@ -90,46 +82,43 @@ pub fn get_week_bounded_days_for_given_date(date: &DateTime<Utc>) -> Vec<DateTim
     result
 }
 
-
 pub fn get_start_and_last_date_of_week_for_given_date(
     date: &DateTime<Utc>,
 ) -> (DateTime<Utc>, DateTime<Utc>) {
     let year = date.year();
     let week_number = date.iso_week().week();
     let start = NaiveDate::from_isoywd_opt(year, week_number, Weekday::try_from(0).unwrap())
-    .unwrap()
-    .and_hms_nano_opt(0, 0, 0, 0)
-    .unwrap()
-    .and_utc();
+        .unwrap()
+        .and_hms_nano_opt(0, 0, 0, 0)
+        .unwrap()
+        .and_utc();
 
     let end = NaiveDate::from_isoywd_opt(year, week_number, Weekday::try_from(6).unwrap())
-    .unwrap()
-    .and_hms_nano_opt(0, 0, 0, 0)
-    .unwrap()
-    .and_utc();
+        .unwrap()
+        .and_hms_nano_opt(0, 0, 0, 0)
+        .unwrap()
+        .and_utc();
 
-    return (
-        start,
-        end,
-    )
-    
+    return (start, end);
 }
-    
 
 // nano second are not able to copy
 pub fn concat_time(
-    schedule_start: DateTime<Utc>,
+    scheduled_date_time: DateTime<Utc>,
     original_scheduled_start_date_time: DateTime<Utc>,
 ) -> DateTime<Utc> {
-    Utc.with_ymd_and_hms(
-        schedule_start.year(),
-        schedule_start.month(),
-        schedule_start.day(),
-        original_scheduled_start_date_time.hour(),
-        original_scheduled_start_date_time.minute(),
-        original_scheduled_start_date_time.second(),
-    )
-    .unwrap()
+    let remp = Utc
+        .with_ymd_and_hms(
+            scheduled_date_time.year(),
+            scheduled_date_time.month(),
+            scheduled_date_time.day(),
+            original_scheduled_start_date_time.hour(),
+            original_scheduled_start_date_time.minute(),
+            original_scheduled_start_date_time.second(),
+        )
+        .unwrap()
+        .with_timezone(&Utc);
+    remp
 }
 #[derive(Debug)]
 pub struct DateDiff {
@@ -138,9 +127,7 @@ pub struct DateDiff {
     pub days: i64,
 }
 
-
-pub fn date_diff(start: &DateTime<Utc>, end: &DateTime<Utc>) -> DateDiff { 
-
+pub fn date_diff(start: &DateTime<Utc>, end: &DateTime<Utc>) -> DateDiff {
     // let start =
     //     DateTime::<Utc>::from_utc(chrono::NaiveDate::parse_from_str(date_string, "%d/%m/%Y")
     //         .unwrap()
@@ -152,13 +139,13 @@ pub fn date_diff(start: &DateTime<Utc>, end: &DateTime<Utc>) -> DateDiff {
     let remaining_days = days % 365;
     let months = remaining_days / 30;
     let days = remaining_days % 30;
-    
+
     DateDiff {
         days,
         years,
         months,
     }
-}   
+}
 
 #[cfg(test)]
 mod test {

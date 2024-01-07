@@ -1,13 +1,32 @@
 use crate::common::{
     assert_diff_between_dates_with_repeated_time, get_start_end_date_month, num_of_diff,
 };
-use chrono::Utc;
+use chrono::{Utc, DateTime};
 use common::add_repeat_time;
 use timex::model::ScheduleDetails;
-use timex::schedule_date_times;
+use timex::{schedule_date_times,unstable_for_month};
 
 #[path = "./common.rs"]
 mod common;
+
+
+fn assert_with_old_api(
+    actual: &Vec<DateTime<Utc>>,
+        job_details: &ScheduleDetails,
+        scheduled_start_date_time: DateTime<Utc>,
+            range_date: (DateTime<Utc>, DateTime<Utc>),
+) {
+    let actual2 = unstable_for_month(
+        &job_details,
+        scheduled_start_date_time,
+        range_date.0,
+        range_date.1,
+    ).unwrap();
+
+    dbg!(&actual);
+    dbg!(&actual2);
+    assert_eq!(actual, &actual2, "new api wrong value",); 
+}
 
 #[test]
 fn it_month_non_stop() {
@@ -51,6 +70,9 @@ fn it_month_non_stop() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     assert_ne!(actual.len(), 0, "every month a date has be produced");
+    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
+
+    
 }
 
 #[test]
@@ -67,8 +89,7 @@ fn it_month_first_monday_non_stop() {
         "--": "Occur every month on first Monday starting on 2023/12/14 14:38"
       }
     "#;
-    
-    
+
     // let sc = r#"
     // {
     //         "scheduledStartDateTime": "2023-12-14T09:08:44.939Z",
@@ -110,8 +131,9 @@ fn it_month_first_monday_non_stop() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     // TODO: check for weekday is correct
+    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
+    
 }
-
 
 #[test]
 fn it_month_special_case_non_stop() {
@@ -126,7 +148,7 @@ fn it_month_special_case_non_stop() {
         "---": "special case"
       }
     "#;
-    
+
     let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
     let original_schedule =
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
@@ -154,10 +176,9 @@ fn it_month_special_case_non_stop() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     // TODO: add test to check end date of the month is equal to given date's end date of the month
+    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
+    
 }
-
-
-
 
 #[test]
 fn it_n_month_on_n_day_non_stop() {
@@ -171,7 +192,7 @@ fn it_n_month_on_n_day_non_stop() {
         "onDayValueForMonth": 1
       }
     "#;
-    
+
     let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
     let original_schedule =
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
@@ -198,6 +219,8 @@ fn it_n_month_on_n_day_non_stop() {
     dbg!(&actual);
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
+    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
+    
 }
 
 // TODO: add test case for start and range on month

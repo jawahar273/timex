@@ -1,4 +1,3 @@
-
 use anyhow::{bail, Result};
 use chrono::{offset, DateTime, Datelike, Days, TimeZone, Timelike, Utc};
 
@@ -6,6 +5,8 @@ use crate::errors::ScheduleError;
 use crate::model::{self, ScheduleDetails};
 use crate::utils::check_date_with_given_range;
 
+
+#[deprecated(since = "0.2.0", note = "moved to unified api logic")]
 pub fn for_days(
     detail: &ScheduleDetails,
     scheduled_start_date_time: DateTime<Utc>,
@@ -25,7 +26,7 @@ pub fn for_days(
             let possible_date: DateTime<Utc> = offset::Utc::now()
                 .checked_add_days(Days::new(detail.occurrence_value.unwrap().try_into()?))
                 .unwrap();
-                
+
             let result =
                 check_date_with_given_range(&possible_date, &start_range_date, &end_range_date);
 
@@ -82,7 +83,17 @@ pub fn for_days(
             .checked_add_days(Days::new(repeat_times.try_into()?))
             .unwrap();
     }
-
+    dbg!("berof concat");
+    dbg!(&schedule_start);
+    // dbg!(Utc.with_ymd_and_hms(
+    //     schedule_start.year(),
+    //     schedule_start.month(),
+    //     schedule_start.day(),
+    //     scheduled_start_date_time.hour(),
+    //     scheduled_start_date_time.minute(),
+    //     scheduled_start_date_time.second(),
+    // )
+    // .unwrap());
     temp.push(
         Utc.with_ymd_and_hms(
             schedule_start.year(),

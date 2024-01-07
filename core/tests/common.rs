@@ -71,7 +71,15 @@ pub fn assert_diff_between_dates_with_repeated_time(
         );
 
         // FIX: ignore today on compare
-        assert_eq!(repeat_time, num_diff,);
+        assert_eq!(
+            repeat_time,
+            num_diff,
+            "{}",
+            format!(
+                "date between is not consistent expected one is {}",
+                &details.repeat_every_number
+            )
+        );
         previous_date = actual_dates[inx]
     }
 }
@@ -83,9 +91,7 @@ pub fn add_repeat_time(
 ) -> DateTime<Utc> {
     let r = (Utc::now() - original_schedule).abs();
     match repeat {
-        RepeatEvery::Day => {
-            Utc::now() - Days::new((r.num_days() / (repeat_time as i64)).try_into().unwrap())
-        }
+        RepeatEvery::Day => Utc::now() - Days::new(repeat_time.try_into().unwrap()),
         RepeatEvery::Week => Utc::now() - Duration::weeks((repeat_time) as i64),
         RepeatEvery::Month => Utc::now() - Months::new(repeat_time.try_into().unwrap()),
         RepeatEvery::Year => todo!(),

@@ -1,14 +1,38 @@
-use chrono::Utc;
+use chrono::{Utc, DateTime};
 use timex::model::ScheduleDetails;
-use timex::schedule_date_times;
+use timex::{
+    schedule_date_times,
+    unstable_for_week,
+};
 
-use crate::common::{assert_diff_between_dates_with_repeated_time, get_start_end_date_week, add_repeat_time};
+use crate::common::{
+    add_repeat_time, assert_diff_between_dates_with_repeated_time, get_start_end_date_week,
+};
 
 #[path = "./common.rs"]
 mod common;
 
 use serde_json;
 
+
+fn assert_with_old_api(
+    actual: &Vec<DateTime<Utc>>,
+        job_details: &ScheduleDetails,
+        scheduled_start_date_time: DateTime<Utc>,
+            range_date: (DateTime<Utc>, DateTime<Utc>),
+) {
+    let actual2 = unstable_for_week(
+        &job_details,
+        scheduled_start_date_time,
+        range_date.0,
+        range_date.1,
+        Some(true),
+    ).unwrap();
+
+    dbg!(&actual);
+    dbg!(&actual2);
+    assert_eq!(actual, &actual2, "new api wrong value",); 
+}
 
 #[test]
 fn it_week_never_stop() {
@@ -28,12 +52,11 @@ fn it_week_never_stop() {
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
             .unwrap()
             .with_timezone(&Utc);
-    let scheduled_start_date_time =
-    add_repeat_time(
+    let scheduled_start_date_time = add_repeat_time(
         job_details.repeat_every_number,
         &original_schedule,
-        &job_details.repeat_every
-     );
+        &job_details.repeat_every,
+    );
 
     let range_date = get_start_end_date_week();
     let actual = schedule_date_times(
@@ -49,6 +72,12 @@ fn it_week_never_stop() {
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
 
     assert_ne!(actual.len(), 0, "every week a date has be produced");
+    assert_with_old_api(
+        &actual,
+        &job_details,
+        scheduled_start_date_time,
+        range_date,
+    )
 }
 
 #[test]
@@ -69,14 +98,12 @@ fn it_week_stop_at_occurrence_of_n() {
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
             .unwrap()
             .with_timezone(&Utc);
-    let scheduled_start_date_time =
-    add_repeat_time(
+    let scheduled_start_date_time = add_repeat_time(
         job_details.repeat_every_number,
         &original_schedule,
-        &job_details.repeat_every
-     );
+        &job_details.repeat_every,
+    );
     dbg!(format!("{job_details}"));
-     
 
     let range_date = get_start_end_date_week();
     let actual = schedule_date_times(
@@ -91,8 +118,12 @@ fn it_week_stop_at_occurrence_of_n() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     // FIX: check why the occurrenceValue is not satisfied
-
-
+    assert_with_old_api(
+        &actual,
+        &job_details,
+        scheduled_start_date_time,
+        range_date,
+    );
 }
 
 #[test]
@@ -118,15 +149,14 @@ fn it_week_occurrence_specific_day_non_stop() {
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
             .unwrap()
             .with_timezone(&Utc);
-        dbg!(format!("{job_details}"));
-    
+    dbg!(format!("{job_details}"));
+
     // let scheduled_start_date_time = add_repeat_time(
     //     job_details.repeat_every_number,
     //     &original_schedule,
     //     &job_details.repeat_every
     //  );
 
-     
     let range_date = get_start_end_date_week();
     let actual = schedule_date_times(
         &job_details,
@@ -141,7 +171,14 @@ fn it_week_occurrence_specific_day_non_stop() {
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
 
     assert_eq!(
-        job_details.week_days_for_repeat_every.unwrap().len() as i64,
+        job_details.week_days_for_repeat_every.clone().unwrap().len() as i64,
         actual.len() as i64,
+    );
+    
+    assert_with_old_api(
+        &actual,
+        &job_details,
+        scheduled_start_date_time,
+        range_date,
     );
 }

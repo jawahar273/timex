@@ -4,10 +4,8 @@ use crate::{
     utils::get_week_bounded_days_for_given_date,
 };
 use anyhow::{Ok, Result};
-use chrono::{
-    offset, DateTime, Duration, Utc,
-    Weekday,
-};
+use chrono::{offset, DateTime, Duration, Utc, Weekday};
+use log::info;
 
 fn temp_result(
     sr: &Box<DateTime<Utc>>,
@@ -38,13 +36,13 @@ fn temp_result(
     temp
 }
 
+#[deprecated(since = "0.2.0", note = "moved to unified api logic")]
 pub fn for_week(
     detail: &ScheduleDetails,
     scheduled_start_date_time: DateTime<Utc>,
     start_range_date: DateTime<Utc>,
     end_range_date: DateTime<Utc>,
     allow_max_occurrences: Option<bool>,
-    // end_date: DateTime<Utc>,
 ) -> Result<Vec<DateTime<Utc>>> {
     let repeat_times = detail.repeat_every_number;
 
@@ -79,12 +77,8 @@ pub fn for_week(
     let is_with_in_range =
         check_date_with_given_range(&schedule_start, &start_range_date, &end_range_date);
 
-    dbg!(&is_with_in_range);
-    dbg!(&start_range_date);
-    dbg!(&schedule_start);
-    dbg!(&end_range_date);
-
     if !is_with_in_range {
+        info!("scheduled date '{schedule_start}'  range not with given of '{start_range_date}' and '{end_range_date}'");
         return Ok(Vec::new());
     }
 
@@ -112,7 +106,6 @@ pub fn for_week(
         let u = get_week_bounded_days_for_given_date(&schedule_start);
         let num = w.num_days_from_monday() as usize;
         result.push(u[num]);
-
     }
 
     Ok(result)

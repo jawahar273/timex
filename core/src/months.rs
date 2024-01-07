@@ -4,15 +4,10 @@ use crate::{
     utils::{check_date_with_given_range, date_diff},
 };
 
-use crate::utils::
-    get_start_and_last_date_of_month_for_given_date
-;
+use crate::utils::get_start_and_last_date_of_month_for_given_date;
 
 use anyhow::{bail, Ok, Result};
-use chrono::{
-    offset, DateTime, Datelike, Months, NaiveDate, TimeZone, Timelike, Utc,
-};
-
+use chrono::{offset, DateTime, Datelike, Months, NaiveDate, TimeZone, Timelike, Utc};
 
 fn non_stop_repeat_every_time(detail: &ScheduleDetails) -> bool {
     if detail.end_option == EndOption::Never {
@@ -27,14 +22,19 @@ fn find_all_weekday_for_give_month(
 ) -> Vec<DateTime<Utc>> {
     let month_range = get_start_and_last_date_of_month_for_given_date(start);
 
-    let mut temp = NaiveDate::from_ymd_opt(month_range.0.year(), month_range.0.month(), month_range.0.day()).unwrap();
+    let mut temp = NaiveDate::from_ymd_opt(
+        month_range.0.year(),
+        month_range.0.month(),
+        month_range.0.day(),
+    )
+    .unwrap();
 
     let mut result: Vec<DateTime<Utc>> = vec![];
     let mut num_diff = (month_range.1 - month_range.0).num_days();
     if month_range.1.day() == 31 {
         num_diff += 1;
     }
-    
+
     for inx in 0..num_diff {
         // temp = temp
         //     .checked_add_days(Days::new(inx.try_into().unwrap()))
@@ -94,6 +94,7 @@ fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTim
     .unwrap()
 }
 
+#[deprecated(since = "0.2.0", note = "moved to unified api logic")]
 pub fn for_month(
     detail: &ScheduleDetails,
     scheduled_start_date_time: DateTime<Utc>,
@@ -147,8 +148,7 @@ pub fn for_month(
         return Ok(Vec::new());
     }
 
-    if non_stop_repeat_every_time(detail)
-    {
+    if non_stop_repeat_every_time(detail) {
         // let diff =  - Utc::now();
         let diff = date_diff(&Utc::now(), &end_date);
         let mut temp = Vec::new();
