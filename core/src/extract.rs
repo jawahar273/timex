@@ -1,83 +1,37 @@
-use crate::date_diff;
-use crate::model::WeekDayForMonth;
 use crate::utils::{
-    check_date_with_given_range, concat_time, get_start_and_last_date_of_month_for_given_date,
+    check_date_with_given_range,
+    concat_time,
+    get_start_and_last_date_of_month_for_given_date,
     get_week_bounded_days_for_given_date,
+    num_diff_i64
 };
 use crate::{
     errors::ScheduleError,
-    model::{self, RepeatEvery, ScheduleDetails},
+    model::{
+        self,
+        RepeatEvery,
+        ScheduleDetails
+    },
+    weeks::find_all_weekday_for_give_month
 };
 use anyhow::{bail, Ok, Result as AnyhowResult};
 use chrono::{
-    offset, DateTime, Datelike, Days, Duration, Months, NaiveDate, TimeZone, Timelike, Utc, Weekday,
+    offset, DateTime,
+    Datelike, Days,
+    Duration, Months,
+    TimeZone, Timelike,
+    Utc, Weekday,
 };
 
 use log::info;
 
-fn find_all_weekday_for_give_month(
-    start: &DateTime<Utc>,
-    week_day: &WeekDayForMonth,
-) -> Vec<DateTime<Utc>> {
-    let month_range = get_start_and_last_date_of_month_for_given_date(start);
 
-    let mut temp = NaiveDate::from_ymd_opt(
-        month_range.0.year(),
-        month_range.0.month(),
-        month_range.0.day(),
-    )
-    .unwrap();
-
-    let mut result: Vec<DateTime<Utc>> = vec![];
-    let mut num_diff = (month_range.1 - month_range.0).num_days();
-    if month_range.1.day() == 31 {
-        num_diff += 1;
-    }
-
-    for _ in 0..num_diff {
-        // temp = temp
-        //     .checked_add_days(Days::new(inx.try_into().unwrap()))
-        //     .unwrap();
-        if temp.weekday() == week_day.to_chrono() {
-            result.push(temp.and_hms_opt(0, 0, 0).unwrap().and_utc());
-        }
-        temp = temp.succ_opt().unwrap();
-    }
-
-    result
-}
-
-fn num_diff_i64(
-    detail: &ScheduleDetails,
-    schedule_start: &DateTime<Utc>,
-    end_date: &DateTime<Utc>,
-) -> i64 {
-    let repeat_times = detail.repeat_every_number;
-    match detail.repeat_every {
-        RepeatEvery::Day => {
-            let diff = *end_date - *schedule_start;
-            let num_days = diff.num_days() / (repeat_times as i64);
-            num_days
-        }
-        RepeatEvery::Week => {
-            let diff = *end_date - Utc::now();
-            let num_of_diff = diff.num_weeks();
-            num_of_diff
-        }
-        RepeatEvery::Month => {
-            let diff = date_diff(&Utc::now(), &end_date);
-            diff.months
-        }
-        RepeatEvery::Year => todo!(),
-    }
-}
-
-fn non_stop_repeat_every_time(detail: &ScheduleDetails) -> bool {
-    if detail.end_option == model::EndOption::Never {
-        return true;
-    }
-    false
-}
+// fn non_stop_repeat_every_time(detail: &ScheduleDetails) -> bool {
+//     if detail.end_option == model::EndOption::Never {
+//         return true;
+//     }
+//     false
+// }
 
 fn get_end_option_after_based_on_repeat(
     detail: &ScheduleDetails,
@@ -203,6 +157,17 @@ fn get_schedule_start(
 }
 
 
+/// Generate schedule date based on the given parameter
+/// [`ScheduleDetails`], 
+///
+/// # Panics
+///
+/// Panics if unexpected or [`Result::expect`] function are trigger
+///
+/// # Errors
+///
+/// This function will return an error if conversion or unexpected value for parameter are
+/// given
 pub fn for_details(
     detail: &ScheduleDetails,
     scheduled_start_date_time: DateTime<Utc>,
@@ -210,9 +175,8 @@ pub fn for_details(
     end_range_date: DateTime<Utc>,
     allow_max_occurrences: Option<bool>,
 ) -> AnyhowResult<Vec<DateTime<Utc>>> {
-    let repeat_times = detail.repeat_every_number;
 
-    info!("repeat for {:?}", &detail.repeat_every);
+    // preprocessing step
     match detail.repeat_every {
         RepeatEvery::Day => {
             if detail.repeat_every_number >= 32 {
@@ -247,7 +211,6 @@ pub fn for_details(
         }
         model::EndOption::Never => end_range_date,
     };
-    dbg!(end_date);
 
     let schedule_start: DateTime<Utc> =
         *get_schedule_start(detail, &scheduled_start_date_time)?;
@@ -255,24 +218,15 @@ pub fn for_details(
     let is_with_in_range =
         check_date_with_given_range(&schedule_start, &start_range_date, &end_range_date);
 
-    dbg!(is_with_in_range);
-    dbg!(&schedule_start);
     if !is_with_in_range {
         info!("scheduled date '{schedule_start}'  range not with given of '{start_range_date}' and '{end_range_date}'");
         return Ok(Vec::new());
     }
 
-    let week_days_for_repeat_every: Vec<String> =
-        match detail.week_days_for_repeat_every.clone().is_none() {
-            true => vec![],
-            false => detail.week_days_for_repeat_every.clone().unwrap(),
-        };
-
     let mut result = Vec::new();
 
     match detail.repeat_every {
         RepeatEvery::Day => {
-            dbg!("on stop non_stop_repeat_every_time");
             let result = non_stop(
                 detail,
                 &scheduled_start_date_time,
@@ -282,6 +236,13 @@ pub fn for_details(
             return result;
         }
         RepeatEvery::Week => {
+
+            let week_days_for_repeat_every: Vec<String> =
+                match detail.week_days_for_repeat_every.clone().is_none() {
+                    true => vec![],
+                    false => detail.week_days_for_repeat_every.clone().unwrap(),
+                };
+        
             if week_days_for_repeat_every.len() >= 1 {
                 for week_day in 0..week_days_for_repeat_every.len() {
                     let w = &week_days_for_repeat_every[week_day]
@@ -314,10 +275,9 @@ pub fn for_details(
         RepeatEvery::Year => todo!(),
     }
 
-    Ok(result)
 }
 
-fn update_before_push(
+fn post_processing_output(
     detail: &ScheduleDetails,
     schedule_start: &DateTime<Utc>,
     scheduled_start_date_time: &DateTime<Utc>,
@@ -344,11 +304,11 @@ fn non_stop(
     for _ in 0..diff {
         result.push(
             // schedule_start
-            update_before_push(detail, &schedule_start, scheduled_start_date_time),
+            post_processing_output(detail, &schedule_start, scheduled_start_date_time),
         );
         schedule_start = *get_schedule_start(detail, &schedule_start)?;
     }
-    result.push(update_before_push(
+    result.push(post_processing_output(
         detail,
         &schedule_start,
         scheduled_start_date_time,

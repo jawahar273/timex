@@ -2,7 +2,7 @@ use chrono::{Utc, DateTime};
 use timex::model::ScheduleDetails;
 use timex::{
     schedule_date_times,
-    unstable_for_week,
+    for_week as unstable_for_week,
 };
 
 use crate::common::{

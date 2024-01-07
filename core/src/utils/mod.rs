@@ -2,6 +2,11 @@ use std::cmp::Ordering;
 
 use chrono::{DateTime, Datelike, Days, NaiveDate, TimeZone, Timelike, Utc, Weekday};
 
+mod diff;
+
+pub use diff::num_diff_i64;
+
+
 fn convert_utc_date_time_to_date_with_zero_hms(date: &DateTime<Utc>) -> DateTime<Utc> {
     Utc.with_ymd_and_hms(date.year(), date.month(), date.day(), 0, 0, 0)
         .unwrap()
@@ -82,7 +87,7 @@ pub fn get_week_bounded_days_for_given_date(date: &DateTime<Utc>) -> Vec<DateTim
     result
 }
 
-pub fn get_start_and_last_date_of_week_for_given_date(
+pub fn _get_start_and_last_date_of_week_for_given_date(
     date: &DateTime<Utc>,
 ) -> (DateTime<Utc>, DateTime<Utc>) {
     let year = date.year();

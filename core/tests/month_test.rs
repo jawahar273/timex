@@ -4,7 +4,7 @@ use crate::common::{
 use chrono::{Utc, DateTime};
 use common::add_repeat_time;
 use timex::model::ScheduleDetails;
-use timex::{schedule_date_times,unstable_for_month};
+use timex::{schedule_date_times, for_month as unstable_for_month};
 
 #[path = "./common.rs"]
 mod common;

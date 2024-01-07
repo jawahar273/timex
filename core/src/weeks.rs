@@ -1,11 +1,52 @@
-use crate::utils::{check_date_with_given_range, concat_time};
+use crate::utils::{
+    check_date_with_given_range, concat_time,
+    get_start_and_last_date_of_month_for_given_date
+};
 use crate::{
-    model::{self, ScheduleDetails},
+    model::{self, ScheduleDetails, WeekDayForMonth},
     utils::get_week_bounded_days_for_given_date,
 };
 use anyhow::{Ok, Result};
-use chrono::{offset, DateTime, Duration, Utc, Weekday};
+use chrono::{
+    offset, DateTime, Duration, Utc,
+     Datelike, NaiveDate, Weekday,
+    
+};
 use log::info;
+
+
+
+pub fn find_all_weekday_for_give_month(
+    start: &DateTime<Utc>,
+    week_day: &WeekDayForMonth,
+) -> Vec<DateTime<Utc>> {
+    let month_range = get_start_and_last_date_of_month_for_given_date(start);
+
+    let mut temp = NaiveDate::from_ymd_opt(
+        month_range.0.year(),
+        month_range.0.month(),
+        month_range.0.day(),
+    )
+    .unwrap();
+
+    let mut result: Vec<DateTime<Utc>> = vec![];
+    let mut num_diff = (month_range.1 - month_range.0).num_days();
+    if month_range.1.day() == 31 {
+        num_diff += 1;
+    }
+
+    for _ in 0..num_diff {
+        // temp = temp
+        //     .checked_add_days(Days::new(inx.try_into().unwrap()))
+        //     .unwrap();
+        if temp.weekday() == week_day.to_chrono() {
+            result.push(temp.and_hms_opt(0, 0, 0).unwrap().and_utc());
+        }
+        temp = temp.succ_opt().unwrap();
+    }
+
+    result
+}
 
 fn temp_result(
     sr: &Box<DateTime<Utc>>,

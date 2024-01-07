@@ -219,20 +219,29 @@ impl WeekDayForMonth {
     }
 }
 
-// Default
+/// Schedule details contain necessary field to process
+/// and contain to generate scheduled date and time
 #[wasm_bindgen(getter_with_clone)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleDetails {
+    /// Schedule started(initial) date should current day or greater
     #[serde(rename = "scheduledStartDateTime")]
     pub scheduled_start_date_time: String,
-
-    #[serde(rename = "repeatEveryNumber")]
-    pub repeat_every_number: u64,
-
+    
+    /// Repeat calendar bases such `day`, `week`, `month` and `year`
     #[serde(rename = "repeatEvery")]
     pub repeat_every: RepeatEvery,
-
+    
+    /// Number of time the repletion should happen
+    /// given value should be greater than or equal to 1
+    #[serde(rename = "repeatEveryNumber")]
+    pub repeat_every_number: u64,
+    
+    /// The type of repeat on how to recurrent schedule should stop or continue.
+    /// - Should the recurrent stop [`EndOption::After`] on given recurrent count time.
+    /// - Should the recurrent never stop [`EndOption::Never`]
+    /// - Should the recurrent stop at the given date [`EndOption::OnThe`]
     #[serde(rename = "endOption")]
     pub end_option: EndOption,
 

@@ -1,22 +1,19 @@
-//! # Timex
-//!
+
+
+#![forbid(unsafe_code)] 
+#![doc = include_str!("../../README.md")]
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 
-use days::for_days;
-
 use log::debug;
 use model::ScheduleDetails;
-use months::for_month;
 use wasm_bindgen::{prelude::wasm_bindgen, *};
-use weeks::for_week;
 use crate::extract::for_details;
 
 pub mod errors;
 pub mod model;
 use crate::model::RepeatEvery;
-use crate::utils::concat_time;
 
 pub use self::utils::{
     date_diff,
@@ -25,9 +22,9 @@ pub use self::utils::{
 };
 
 pub use self::extract::for_details as unstable_for_details;
-pub use self::weeks::for_week as unstable_for_week;
-pub use self::days::for_days as unstable_for_days;
-pub use self::months::for_month as unstable_for_month;
+pub use self::weeks::for_week;
+pub use self::days::for_days;
+pub use self::months::for_month;
 
 mod days;
 mod extract;
@@ -66,7 +63,6 @@ fn generate_schedule_date_time(
             //     end_range_date,
             //     Some(true),
             // )
-            
             for_details(
                 detail,
                 previous_scheduled_date,

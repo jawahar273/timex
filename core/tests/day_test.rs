@@ -7,7 +7,7 @@ use timex::model::ScheduleDetails;
 use timex::{
     schedule_date_times,
     unstable_for_details,
-    unstable_for_days,
+    for_days as unstable_for_days,
     unstable_get_start_and_last_date_of_month_for_given_date as get_start_and_last_date_of_month_for_given_date,
 };
 #[path = "./common.rs"]
