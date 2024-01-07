@@ -1,11 +1,30 @@
-'use client'
-import { useForm, SubmitHandler, UseFormRegister, FieldPath } from "react-hook-form"
+"use client";
+import {
+  useForm,
+  SubmitHandler,
+  UseFormRegister,
+  FieldPath,
+} from "react-hook-form";
 
-import { EndOption, RepeatEvery, SetEventType, TimexEvent } from '@timex/types'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { EndOption, RepeatEvery, SetEventType, TimexEvent } from "@timex/types";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { TInputs, Types } from "./types";
 import { Input } from "../ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@radix-ui/react-select";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
@@ -13,108 +32,115 @@ import { cn } from "@timex/utils";
 import { format } from "date-fns";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
-import axios from 'axios';
+import axios from "axios";
 import dayjs from "dayjs";
 
 type DateProps = {
   setEvent: (details: SetEventType) => void;
-}
-
+};
 
 function demoFill(data: TInputs) {
   switch (data.type) {
     default:
     case Types.EVERY_DAY: {
-      data ={
+      data = {
         ...data,
-        "repeatEveryNumber": 1,
-        "repeatEvery": "day" as RepeatEvery,
-        "endOption": "never" as EndOption,
-      }
+        repeatEveryNumber: 1,
+        repeatEvery: "day" as RepeatEvery,
+        endOption: "never" as EndOption,
+      };
       return data;
     }
     case Types.EVERY_WEEK: {
       data = {
         ...data,
-        "repeatEveryNumber": 1,
-        "repeatEvery": "week" as RepeatEvery,
-        "endOption": "never" as EndOption,
-        "weekDaysForRepeatEvery": []
-      }
+        repeatEveryNumber: 1,
+        repeatEvery: "week" as RepeatEvery,
+        endOption: "never" as EndOption,
+        weekDaysForRepeatEvery: [],
+      };
       return data;
     }
-    case Types.EVERY_MONTH : {
-      
+    case Types.EVERY_MONTH: {
       return {
         ...data,
-        "repeatEveryNumber": 2,
-        "repeatEvery": "month" as RepeatEvery,
-        "endOption": "never",
-        "monthOptions": "onDay",
-        "onDayValueForMonth": 1,
+        repeatEveryNumber: 1,
+        repeatEvery: "month" as RepeatEvery,
+        endOption: "never",
+        monthOptions: "onDay",
+        onDayValueForMonth: 1,
       };
     }
     case Types.EVERY_MONTH_2: {
-      return data;
+      return {
+        ...data,
+        repeatEveryNumber: 2,
+        repeatEvery: "month" as RepeatEvery,
+        endOption: "never",
+        monthOptions: "onDay",
+        onDayValueForMonth: 1,
+      };
     }
   }
 }
 
-export function Date(props: DateProps) {
+export function DateJsx(props: DateProps) {
   const form = useForm<TInputs>({
     defaultValues: {
       repeatEveryNumber: 1,
       repeatEveryType: RepeatEvery.Day,
-    }
-  })
+    },
+  });
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     // data.scheduledStartDateTime = typeof data.scheduledStartDateTime === 'date' ? data.scheduledStartDateTime.toISOString() : data.scheduledStartDateTime;
-    console.log(demoFill(data), data)
-    const res = await axios.post<TimexEvent>('http://localhost:8300/api/v1/schedule/',
-    {
-     details: demoFill(data),
-     previousScheduleDate: dayjs().subtract(1, 'day').toISOString(),
-     startDate: dayjs('2024-01-04').toISOString(),
-     endDate: dayjs('2024-01-06').toISOString()
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
+    const temp = demoFill(data);
+    temp.scheduledStartDateTime = dayjs(temp.scheduledStartDateTime)
+      .second(59)
+      .minute(59)
+      .hour(11)
+      .toDate();
+    console.log(
+      "====###====",
+      temp,
+      data,
+      dayjs().endOf("month").format("YYYY-MM-DDT00:00:00.00Z")
+    );
+    const res = await axios.post<TimexEvent>(
+      "http://localhost:8300/api/v1/schedule/",
+      {
+        details: demoFill(data),
+        previousScheduleDate: dayjs(
+          dayjs().subtract(1, "day").format("YYYY-MM-DDT11:59:00.000Z")
+        ).toISOString(),
+        startDate: dayjs()
+          .startOf("month")
+          .add(1, "day")
+          .format("YYYY-MM-DDT00:00:00.000Z"),
+        endDate: dayjs()
+          .add(2, "months")
+          .endOf("month")
+          .format("YYYY-MM-DDT00:00:00.000Z"),
       },
-    }
-    )
-    props.setEvent({events: res.data})
-    console.log(res)
-  }
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    props.setEvent({ events: res.data });
+    console.log(res);
+  };
 
   // console.log("====", repeatEvery)
 
   return (
     <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Name" {...field} />
-              </FormControl>
-              <FormDescription>
-                Name of schedule
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-          
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pt-3">
         <FormField
           control={form.control}
           name="scheduledStartDateTime"
           rules={{
-            required: true
+            required: true,
           }}
           render={({ field }) => (
             <FormItem className="flex flex-col">
@@ -149,34 +175,38 @@ export function Date(props: DateProps) {
                   />
                 </PopoverContent>
               </Popover>
-              <FormDescription>
-              </FormDescription>
+              <FormDescription></FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-<FormField
+        <FormField
           control={form.control}
           name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Demo options: </FormLabel>
-              <FormControl> 
-              <select {...field} defaultValue={Types.EVERY_DAY} multiple={false}>
-              <option value={Types.EVERY_DAY}>{Types.EVERY_DAY}</option>
-              <option value={Types.EVERY_WEEK}>{Types.EVERY_WEEK}</option>
-              <option value={Types.EVERY_MONTH}>{Types.EVERY_MONTH}</option>
-              <option value={Types.EVERY_MONTH_2}>{Types.EVERY_MONTH_2}</option>
-          </select>
+              <FormControl>
+                <select
+                  {...field}
+                  defaultValue={Types.EVERY_DAY}
+                  multiple={false}
+                >
+                  <option value={Types.EVERY_DAY}>{Types.EVERY_DAY}</option>
+                  <option value={Types.EVERY_WEEK}>{Types.EVERY_WEEK}</option>
+                  <option value={Types.EVERY_MONTH}>{Types.EVERY_MONTH}</option>
+                  <option value={Types.EVERY_MONTH_2}>
+                    {Types.EVERY_MONTH_2}
+                  </option>
+                </select>
               </FormControl>
-              <FormDescription>
-              </FormDescription>
+              <FormDescription></FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         {/* <FormField
           control={form.control}
           name="endDate"
@@ -193,10 +223,7 @@ export function Date(props: DateProps) {
           )}
         /> */}
         <Button type="submit">Submit</Button>
-        
       </form>
-  </Form>
- 
-  )
+    </Form>
+  );
 }
-

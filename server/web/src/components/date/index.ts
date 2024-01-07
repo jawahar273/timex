@@ -1,3 +1,2 @@
-
-export { DateCalendar } from './calendar';
-export { Date } from './date';
+export { DateCalendar } from "./calendar";
+export { DateJsx } from "./date";

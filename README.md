@@ -1,4 +1,4 @@
-# Timex:Date Time Generator
+# Timex: Schedule Date Time Generator
 
 This Rust library allows you to generate date times based on a start and end date, along with other parameters. It utilizes the chrono crate for date and time manipulations.
 
