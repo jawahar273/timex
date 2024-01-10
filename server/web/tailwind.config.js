@@ -80,6 +80,9 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
+      gridTemplateRows: {
+        '16': 'repeat(16, minmax(0, 1fr))',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

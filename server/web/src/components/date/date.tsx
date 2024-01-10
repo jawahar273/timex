@@ -91,6 +91,7 @@ export function DateJsx(props: DateProps) {
       repeatEveryType: RepeatEvery.Day,
     },
   });
+
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     // data.scheduledStartDateTime = typeof data.scheduledStartDateTime === 'date' ? data.scheduledStartDateTime.toISOString() : data.scheduledStartDateTime;
     const temp = demoFill(data);
@@ -99,25 +100,22 @@ export function DateJsx(props: DateProps) {
       .minute(59)
       .hour(11)
       .toDate();
-    console.log(
-      "====###====",
-      temp,
-      data,
-      dayjs().endOf("month").format("YYYY-MM-DDT00:00:00.00Z")
-    );
+
     const res = await axios.post<TimexEvent>(
       "http://localhost:8300/api/v1/schedule/",
       {
         details: demoFill(data),
         previousScheduleDate: dayjs(
-          dayjs().subtract(1, "day").format("YYYY-MM-DDT11:59:00.000Z")
+          dayjs(temp.scheduledStartDateTime)
+            .subtract(1, "day")
+            .format("YYYY-MM-DDT11:59:00.000Z")
         ).toISOString(),
         startDate: dayjs()
           .startOf("month")
           .add(1, "day")
           .format("YYYY-MM-DDT00:00:00.000Z"),
         endDate: dayjs()
-          .add(2, "months")
+          .add(14, "months")
           .endOf("month")
           .format("YYYY-MM-DDT00:00:00.000Z"),
       },

@@ -18,20 +18,12 @@ type temp = typeof Calendar;
 type Props = React.ComponentProps<temp> & {
   localizer?: DateLocalizer;
   cEvents: Event[];
+  defaultDate?: Date;
 };
 
 let allViews = Object.keys(Views).map((k) => Views[k as keyof typeof Views]);
 
 export const DateCalendar = (props: Omit<Props, "localizer">) => {
-  // const [view, setView] = useState(Views.MONTH);
-  // const onView = useCallback((newView: any) => setView(newView), [])
-  // const { defaultDate, max } = useMemo(
-  //   () => ({
-  //     defaultDate: new Date(2015, 3, 13),
-  //     max: dayjs().add(100, 'days').toDate(),
-  //   }),
-  //   []
-  // )
 
   return (
     <div>
@@ -40,6 +32,7 @@ export const DateCalendar = (props: Omit<Props, "localizer">) => {
         events={props.cEvents}
         // startAccessor="start"
         // endAccessor="end"
+        defaultDate={props.defaultDate}
         step={60}
         view={Views.MONTH}
         showMultiDayTimes
