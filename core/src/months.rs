@@ -53,7 +53,6 @@ fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTim
     let end_date_of_month = y.1;
 
     let mut day = detail.on_day_value_for_month.unwrap_or(0) as u32;
-    dbg!(&day);
     if day >= end_date_of_month.day() {
         day = end_date_of_month.day();
     } else {
@@ -154,7 +153,6 @@ pub fn for_month(
         let mut temp = Vec::new();
 
         for _ in 0..diff.months {
-            dbg!(&schedule_for);
             temp.push(set_date(detail, &schedule_for));
             schedule_for = schedule_for + Months::new(repeat_times as u32);
         }

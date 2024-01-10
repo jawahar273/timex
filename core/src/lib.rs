@@ -19,6 +19,7 @@ pub use self::utils::{
     date_diff,
     get_start_and_last_date_of_month_for_given_date as unstable_get_start_and_last_date_of_month_for_given_date,
     get_week_bounded_days_for_given_date as unstable_get_week_bounded_days_for_given_date,
+    get_start_and_last_of_year as unstable_get_start_and_last_of_year
 };
 
 pub use self::extract::for_details as unstable_for_details;
@@ -107,10 +108,7 @@ pub fn schedule_date_times(
     //     detail.scheduled_start_date_time.as_str()
     // )?.with_timezone(&Utc);
     return match detail.repeat_every {
-        RepeatEvery::Day => {
-            unstable_for_details(detail, previous_scheduled_date, start_range_date, end_range_date, Some(true))
-        }
-        _ => {
+        RepeatEvery::Year => {
             generate_schedule_date_time(
                 detail,
                 previous_scheduled_date,
@@ -118,18 +116,27 @@ pub fn schedule_date_times(
                 end_range_date,
             )
         }
+        _ => {
+            unstable_for_details(detail, previous_scheduled_date, start_range_date, end_range_date, Some(true))
+        }
     }
+}
+
+#[wasm_bindgen(js_name = showDetailInDisplay)]
+pub fn show_detail_in_display(detail: &ScheduleDetails) -> JsValue {
+    return format!("{}", detail).into();
 }
 
 #[wasm_bindgen]
 // #[no_marg]
 pub fn find_schedule_date_time(
-    detail: &ScheduleDetails,
+    _detail: JsValue,
     previous_scheduled_date: String,
     start_range_date: String,
     end_range_date: String,
-) -> std::result::Result<Vec<String>, JsValue> {
+) -> std::result::Result<Vec<JsValue>, JsValue> {
     let mut _previous_scheduled_date: DateTime<Utc>;
+    let detail: ScheduleDetails = serde_wasm_bindgen::from_value(_detail)?;
 
     match DateTime::parse_from_rfc3339(&previous_scheduled_date) {
         Ok(v) => _previous_scheduled_date = v.with_timezone(&Utc),
@@ -151,13 +158,13 @@ pub fn find_schedule_date_time(
     };
 
     let t = generate_schedule_date_time(
-        detail,
+        &detail,
         _previous_scheduled_date,
         _start_range_date,
         _end_range_date,
     );
     match t {
-        Ok(v) => Ok(v.into_iter().map(|x| x.to_rfc3339()).collect::<Vec<_>>()),
+        Ok(v) => Ok(v.into_iter().map(|x| x.to_rfc3339().into()).collect::<Vec<_>>()),
         Err(e) => Err(e.to_string().into()),
     }
 }

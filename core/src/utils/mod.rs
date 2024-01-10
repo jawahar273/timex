@@ -50,6 +50,34 @@ fn first_of_month(year: i32, month: u32) -> Option<chrono::NaiveDate> {
         .or_else(|| chrono::NaiveDate::from_ymd_opt(year + 1, 1, 1))
 }
 
+fn last_of_year(year: i32) -> Option<chrono::NaiveDate> {
+    chrono::NaiveDate::from_ymd_opt(year+1, 1, 1)
+        .unwrap()
+        .pred_opt()
+}
+
+fn first_of_year(year: i32) -> Option<chrono::NaiveDate> {
+    chrono::NaiveDate::from_ymd_opt(year, 1, 1)
+}
+
+pub fn get_start_and_last_of_year(
+    date: &DateTime<Utc>,
+    ) -> (DateTime<Utc>, DateTime<Utc>) {
+        let year = date.year();
+        (
+            first_of_year(year)
+                .unwrap()
+                .and_hms_opt(0, 0, 0)
+                .unwrap()
+                .and_utc(),
+            last_of_year(year)
+                .unwrap()
+                .and_hms_opt(0, 0, 0)
+                .unwrap()
+                .and_utc(),
+        )
+    }
+
 pub fn get_start_and_last_date_of_month_for_given_date(
     date: &DateTime<Utc>,
 ) -> (DateTime<Utc>, DateTime<Utc>) {

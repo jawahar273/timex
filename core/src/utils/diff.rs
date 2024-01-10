@@ -4,7 +4,7 @@ use crate::
     model::{RepeatEvery, ScheduleDetails}
 ;
 use chrono::{
-    DateTime, Utc,
+    DateTime, Utc, Duration,
 };
 
 
@@ -28,7 +28,13 @@ pub fn num_diff_i64(
         }
         RepeatEvery::Month => {
             let diff = date_diff(&Utc::now(), &end_date);
-            diff.months
+            // day are ignore
+            let y = diff.years * 12;
+            if (y >= 1) {
+                y + diff.months
+            } else {
+                diff.months
+            }
         }
         RepeatEvery::Year => todo!(),
     }

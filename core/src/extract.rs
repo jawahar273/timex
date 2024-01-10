@@ -14,7 +14,7 @@ use crate::{
     },
     weeks::find_all_weekday_for_give_month
 };
-use anyhow::{bail, Ok, Result as AnyhowResult};
+use anyhow::{bail, Ok, Result};
 use chrono::{
     offset, DateTime,
     Datelike, Days,
@@ -38,7 +38,7 @@ fn get_end_option_after_based_on_repeat(
     start_range_date: &DateTime<Utc>,
     end_range_date: &DateTime<Utc>,
     allow_max_occurrences: Option<bool>,
-) -> AnyhowResult<DateTime<Utc>> {
+) -> Result<DateTime<Utc>> {
     match detail.repeat_every {
         RepeatEvery::Day => {
             let possible_date: DateTime<Utc> = offset::Utc::now()
@@ -87,7 +87,9 @@ fn get_end_option_after_based_on_repeat(
 
 fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTime<Utc> {
     let y = get_start_and_last_date_of_month_for_given_date(&scheduled_date);
+    let start_date_of_month = y.0;
     let end_date_of_month = y.1;
+    let on_day_value_for_month = detail.on_day_value_for_month.unwrap_or(0) as u32;
 
     let mut day = detail.on_day_value_for_month.unwrap_or(0) as u32;
 
@@ -95,7 +97,8 @@ fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTim
         day = end_date_of_month.day();
     } else {
         day = scheduled_date.day();
-
+        
+        // when it has week days date are change accounting to select week day date
         if detail.week_day_for_month.is_some() {
             let temp = find_all_weekday_for_give_month(
                 scheduled_date,
@@ -117,6 +120,10 @@ fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTim
             };
 
             day = i.unwrap().day();
+        } else if on_day_value_for_month > end_date_of_month.day() {
+            day = end_date_of_month.day();
+        } else if on_day_value_for_month <= end_date_of_month.day() {
+            day = on_day_value_for_month
         }
     }
 
@@ -174,7 +181,7 @@ pub fn for_details(
     start_range_date: DateTime<Utc>,
     end_range_date: DateTime<Utc>,
     allow_max_occurrences: Option<bool>,
-) -> AnyhowResult<Vec<DateTime<Utc>>> {
+) -> Result<Vec<DateTime<Utc>>> {
 
     // preprocessing step
     match detail.repeat_every {
@@ -207,6 +214,7 @@ pub fn for_details(
                 detail.end_date.as_ref().unwrap().as_str(),
             )?
             .with_timezone(&Utc);
+            dbg!(t);
             t
         }
         model::EndOption::Never => end_range_date,
@@ -214,7 +222,7 @@ pub fn for_details(
 
     let schedule_start: DateTime<Utc> =
         *get_schedule_start(detail, &scheduled_start_date_time)?;
-
+    dbg!(&schedule_start);
     let is_with_in_range =
         check_date_with_given_range(&schedule_start, &start_range_date, &end_range_date);
 
@@ -295,19 +303,21 @@ fn non_stop(
     scheduled_start_date_time: &DateTime<Utc>,
     _schedule_start: DateTime<Utc>,
     end_date: &DateTime<Utc>,
-) -> AnyhowResult<Vec<DateTime<Utc>>> {
+) -> Result<Vec<DateTime<Utc>>> {
     let mut result = Vec::new();
     let mut schedule_start = _schedule_start;
 
     let diff = num_diff_i64(detail, &schedule_start, &end_date);
-    dbg!(diff);
+
     for _ in 0..diff {
         result.push(
             // schedule_start
             post_processing_output(detail, &schedule_start, scheduled_start_date_time),
         );
         schedule_start = *get_schedule_start(detail, &schedule_start)?;
+        
     }
+
     result.push(post_processing_output(
         detail,
         &schedule_start,

@@ -4,6 +4,7 @@ use timex::{
     model::{RepeatEvery, ScheduleDetails},
     unstable_get_start_and_last_date_of_month_for_given_date as get_start_and_last_date_of_month_for_given_date,
     unstable_get_week_bounded_days_for_given_date as get_week_bounded_days_for_given_date,
+    unstable_get_start_and_last_of_year as get_start_and_last_of_year
 };
 
 pub fn get_start_end_date_week() -> (DateTime<Utc>, DateTime<Utc>) {
@@ -26,6 +27,15 @@ pub fn get_start_end_date_month() -> (DateTime<Utc>, DateTime<Utc>) {
     dbg!(&d.1);
 
     (a.0, e.1)
+}
+
+pub fn get_start_end_date_year() -> (DateTime<Utc>, DateTime<Utc>) {
+    let a = get_start_and_last_of_year(&Utc::now());
+    let b = get_start_and_last_of_year(&(a.1 + Days::new(1)));
+    let c = get_start_and_last_of_year(&(b.1 + Days::new(1)));
+    let d = get_start_and_last_of_year(&(c.1 + Days::new(1)));
+    
+    (a.0, d.1)
 }
 
 pub fn num_of_diff(
@@ -96,4 +106,32 @@ pub fn add_repeat_time(
         RepeatEvery::Month => Utc::now() - Months::new(repeat_time.try_into().unwrap()),
         RepeatEvery::Year => todo!(),
     }
+}
+
+pub struct CTemp {
+    pub job_details: ScheduleDetails,
+    pub range_date: (DateTime<Utc>, DateTime<Utc>),
+    pub scheduled_start_date_time: DateTime<Utc>,
+    // original_schedule: DateTime<Utc>,
+}
+
+pub fn common_para_for_test(sc: &str) -> CTemp{
+    let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
+    let original_schedule =
+        chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
+            .unwrap()
+            .with_timezone(&Utc);
+    let scheduled_start_date_time = add_repeat_time(
+        job_details.repeat_every_number,
+        &original_schedule,
+        &job_details.repeat_every,
+    );
+
+    let range_date = get_start_end_date_month();
+    return CTemp{
+        job_details,
+        range_date,
+        scheduled_start_date_time,
+        // original_schedule
+    };
 }
