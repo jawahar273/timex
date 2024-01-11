@@ -26,6 +26,6 @@ FROM  gcr.io/distroless/static-debian12
 # FROM debian
 WORKDIR /demo
 
-COPY --from=rust-build /app/server/target/release/rust.app /demo/r/
-COPY --from=go-build /go/bin/go.app /demo/g/
+COPY --from=rust-build /app/server/target/release/app /demo/r/
+COPY --from=go-build /go/bin/app /demo/g/
 
