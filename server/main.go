@@ -44,6 +44,7 @@ func main() {
 
 	v.SetDefault("GIN_MODE", DEVELOPMENT)
 	v.SetDefault("PORT", 8300)
+	v.SetDefault("R_HOST", "[::1]")
 
 	if v.GetString("GIN_MODE") == DEVELOPMENT {
 		log.Info().Msg("Development environment")
@@ -140,7 +141,7 @@ func main() {
 	go func() {
 		log.Info().Msg("start the server")
 
-		grpcConn, err = GrpcClient(ctx, "[::1]:50051")
+		grpcConn, err = GrpcClient(ctx, v.GetString("R_HOST")+":50051")
 		// pbV1.send
 
 		if err != nil {

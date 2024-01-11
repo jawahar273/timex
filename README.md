@@ -18,6 +18,7 @@ timex = "0.0.1"
 - Time range
 - Occurrence
 - Based on daily, weekly, monthly(WIP: end date) and yearly(soon)..
+- Web assembly support(Soon)
 
 ## Limitation
 
