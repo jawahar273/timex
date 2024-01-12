@@ -1,15 +1,13 @@
-
-
-#![forbid(unsafe_code)] 
+#![forbid(unsafe_code)]
 #![doc = include_str!("../../README.md")]
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 
+use crate::extract::for_details;
 use log::debug;
 use model::ScheduleDetails;
 use wasm_bindgen::{prelude::wasm_bindgen, *};
-use crate::extract::for_details;
 
 pub mod errors;
 pub mod model;
@@ -18,14 +16,14 @@ use crate::model::RepeatEvery;
 pub use self::utils::{
     date_diff,
     get_start_and_last_date_of_month_for_given_date as unstable_get_start_and_last_date_of_month_for_given_date,
+    get_start_and_last_of_year as unstable_get_start_and_last_of_year,
     get_week_bounded_days_for_given_date as unstable_get_week_bounded_days_for_given_date,
-    get_start_and_last_of_year as unstable_get_start_and_last_of_year
 };
 
-pub use self::extract::for_details as unstable_for_details;
-pub use self::weeks::for_week;
 pub use self::days::for_days;
+pub use self::extract::for_details as unstable_for_details;
 pub use self::months::for_month;
+pub use self::weeks::for_week;
 
 mod days;
 mod extract;
@@ -108,18 +106,20 @@ pub fn schedule_date_times(
     //     detail.scheduled_start_date_time.as_str()
     // )?.with_timezone(&Utc);
     return match detail.repeat_every {
-        RepeatEvery::Year => {
-            generate_schedule_date_time(
-                detail,
-                previous_scheduled_date,
-                start_range_date,
-                end_range_date,
-            )
-        }
-        _ => {
-            unstable_for_details(detail, previous_scheduled_date, start_range_date, end_range_date, Some(true))
-        }
-    }
+        RepeatEvery::Year => generate_schedule_date_time(
+            detail,
+            previous_scheduled_date,
+            start_range_date,
+            end_range_date,
+        ),
+        _ => unstable_for_details(
+            detail,
+            previous_scheduled_date,
+            start_range_date,
+            end_range_date,
+            Some(true),
+        ),
+    };
 }
 
 #[wasm_bindgen(js_name = showDetailInDisplay)]
@@ -164,7 +164,10 @@ pub fn find_schedule_date_time(
         _end_range_date,
     );
     match t {
-        Ok(v) => Ok(v.into_iter().map(|x| x.to_rfc3339().into()).collect::<Vec<_>>()),
+        Ok(v) => Ok(v
+            .into_iter()
+            .map(|x| x.to_rfc3339().into())
+            .collect::<Vec<_>>()),
         Err(e) => Err(e.to_string().into()),
     }
 }
