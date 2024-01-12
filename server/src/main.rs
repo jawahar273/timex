@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use serde_json::{self, json, Value};
+use std::env;
 use std::{fmt, net::SocketAddr, time::Duration};
 use timex::model::{
     DayCategoryFor, EndOption, MonthOptions, ScheduleDetails as TScheduleDetails, WeekDayForMonth,
@@ -89,9 +90,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     health_reporter.set_serving::<TsserverService>().await;
 
     tokio::spawn(twiddle_service_status(health_reporter.clone()));
+    
+    let host: String = env::var("R_HOST")?;
+    let addr: SocketAddr = host.parse().unwrap();
 
-    let addr: SocketAddr = "[::1]:50051".parse().unwrap();
-    dbg!(&addr);
     let svc = Service::default();
     let t = TimexServer::new(svc);
     Server::builder()
