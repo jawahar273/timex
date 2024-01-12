@@ -92,6 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tokio::spawn(twiddle_service_status(health_reporter.clone()));
     
     let host: String = env::var("R_HOST")?;
+    println!("host name -{}-", host);
     let addr: SocketAddr = host.parse().unwrap();
 
     let svc = Service::default();
