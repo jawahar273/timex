@@ -102,7 +102,7 @@ export function DateJsx(props: DateProps) {
       .toDate();
 
     const res = await axios.post<TimexEvent>(
-      "http://localhost:8300/api/v1/schedule/",
+      "/api/v1/schedule/",
       {
         details: demoFill(data),
         previousScheduleDate: dayjs(
