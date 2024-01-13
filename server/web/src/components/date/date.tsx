@@ -85,6 +85,31 @@ function demoFill(data: TInputs) {
         onDayValueForMonth: 1,
       };
     }
+    case Types.EVERY_MONTH_LAST_DAY : {
+      return {
+        ...data,
+
+        "repeatEveryNumber": 1,
+        "repeatEvery": "month",
+        "endOption": "onThe",
+        "endDate":         dayjs()
+        .add(12, "months")
+        .format("YYYY-MM-DDT11:59:00.000Z"),
+        "monthOptions": "onDay",
+        "onDayValueForMonth": 31,
+      }
+    }
+    
+    case Types.FOR_EVERY_MONTH_1ST_DAY: {
+      return {
+        ...data,
+        "repeatEveryNumber": 1,
+        "repeatEvery": "month",
+        "endOption": "never",
+        "monthOptions": "onDay",
+        "onDayValueForMonth": 1,
+      }
+    }
   }
 }
 
@@ -218,11 +243,18 @@ try {
                   defaultValue={Types.EVERY_DAY}
                   multiple={false}
                 >
+
                   <option value={Types.EVERY_DAY}>{Types.EVERY_DAY}</option>
                   <option value={Types.EVERY_WEEK}>{Types.EVERY_WEEK}</option>
                   <option value={Types.EVERY_MONTH}>{Types.EVERY_MONTH}</option>
                   <option value={Types.EVERY_MONTH_2}>
                     {Types.EVERY_MONTH_2}
+                  </option>
+                  <option value={Types.FOR_EVERY_MONTH_1ST_DAY}>
+                    {Types.FOR_EVERY_MONTH_1ST_DAY}
+                  </option>
+                  <option value={Types.EVERY_MONTH_LAST_DAY}>
+                    {Types.EVERY_MONTH_LAST_DAY}
                   </option>
                 </select>
               </FormControl>
