@@ -1,15 +1,15 @@
+const path = require('path');
+
 const rewrites = () => {
-    
-    if(!process.env.NODE_ENV === 'production') {    
-        return []    
-    } else {
+    const API_DOMAIN = process.env.API_DOMAIN || 'http://localhost:8300'
+
         return [
             {
                 source: '/api/:path*',
-                destination: 'https://timex.up.railway.app/api/:path*'
+                destination: path.join(API_DOMAIN, '/api/:path*')
             }
-        ]
-    }
+        ]   
+
 }
 
 /** @type {import('next').NextConfig} */
