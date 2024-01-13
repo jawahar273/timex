@@ -1,14 +1,14 @@
 const rewrites = () => {
     
-    if(process.env.NODE_ENV === 'production') {        
+    if(!process.env.NODE_ENV === 'production') {    
+        return []    
+    } else {
         return [
             {
                 source: '/api/:path*',
                 destination: 'https://timex.up.railway.app/api/:path*'
             }
         ]
-    } else {
-        return []
     }
 }
 
