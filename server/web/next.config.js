@@ -1,7 +1,7 @@
 
 const rewrites = () => {
     const API_DOMAIN = process.env.API_DOMAIN || 'http://localhost:8300'
-
+console.log("api path", new URL ('/api/:path*', API_DOMAIN).href)
         return [
             {
                 source: '/api/:path*',
