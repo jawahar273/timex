@@ -100,9 +100,10 @@ export function DateJsx(props: DateProps) {
       .minute(59)
       .hour(11)
       .toDate();
+const API_DOMAIN = process.env.API_DOMAIN || 'http://localhost:8300'
 
     const res = await axios.post<TimexEvent>(
-      "/api/v1/schedule/",
+      new URL ( "/api/v1/schedule/", API_DOMAIN).href,
       {
         details: demoFill(data),
         previousScheduleDate: dayjs(

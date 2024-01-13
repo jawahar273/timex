@@ -1,6 +1,4 @@
 "use client";
-import Image from "next/image";
-import dynamic from "next/dynamic";
 
 import { DateJsx, DateCalendar } from "@timex/components";
 
@@ -10,44 +8,25 @@ import {
   ResizablePanelGroup,
 } from "@timex/components/ui/resizable";
 import dayjs from "dayjs";
-import { ReactNode, useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { Event } from "react-big-calendar";
 import { SetEventType } from "@timex/types";
-import { Highlighter, HighlighterLang } from "@timex/components/highlight";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@radix-ui/react-accordion";
 import { Card, CardContent } from "@timex/components/ui/card";
-import { BlendingModeIcon as BadgeIcon } from "@radix-ui/react-icons";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@timex/components/ui/tabs";
-import { Button } from "@timex/components/ui/button";
 
 import { string } from "zod";
+import axios from "axios";
 
 // import timexW, {
 //   showDetailInDisplay,
 //   initSync,
 //   SyncInitInput,
 // } from "../../pkg/timex";
-import { groupBy } from "lodash";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@radix-ui/react-dialog";
-import { Label } from "@radix-ui/react-label";
-import { DialogHeader, DialogFooter } from "@timex/components/ui/dialog";
-import { Input } from "@timex/components/ui/input";
 
 // async function Temp() {
 //   const wasm = await timexW("../../pkg/timex");
@@ -74,8 +53,9 @@ export default function Home() {
   const [dateTime, setDateTime] = useState<Record<string, Event[]>>();
   const [orignal, setOrignal] = useState<string>("");
 
-  const setEvent = useCallback(({ events }: SetEventType) => {
-    setOrignal(JSON.stringify(events.scheduledDateTime, null, 3));
+  const setEvent = ({ events }: SetEventType) => {
+    setOrignal(JSON.stringify(events.scheduledDateTime || [], null, 3));
+    console.log('===>', JSON.stringify(events.scheduledDateTime || [], null, 3))
     let y: Record<string, Event[]> = {};
     events.scheduledDateTime.forEach((r) => {
       let u = dayjs(r);
@@ -91,9 +71,9 @@ export default function Home() {
         y[key as keyof typeof string].push(value);
       }
     });
-    console.log("$$$$$$$$$$$$$$$$", y);
+
     setDateTime(y);
-  }, []);
+  }
 
   return (
     <main className="m-2">
@@ -104,7 +84,7 @@ export default function Home() {
       <Card>
         <CardContent>
           <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={15}>
+            <ResizablePanel defaultSize={25}>
               <DateJsx setEvent={setEvent} />
               {/* 
               <div className="flex flex-col">
@@ -143,12 +123,15 @@ export default function Home() {
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="payload">
-                      {orignal && (
+                      {
+                        orignal
+                      }
+                      {/* {orignal && (
                         <Highlighter
                           content={orignal}
                           language={HighlighterLang.JSON}
                         />
-                      )}
+                      )} */}
                     </TabsContent>
                     <TabsContent value="calender">
                       <div>
