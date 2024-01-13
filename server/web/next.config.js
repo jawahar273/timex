@@ -1,4 +1,3 @@
-const path = require('path');
 
 const rewrites = () => {
     const API_DOMAIN = process.env.API_DOMAIN || 'http://localhost:8300'
@@ -6,7 +5,7 @@ const rewrites = () => {
         return [
             {
                 source: '/api/:path*',
-                destination: path.join(API_DOMAIN, '/api/:path*')
+                destination: new URL ('/api/:path*', API_DOMAIN).href
             }
         ]   
 
