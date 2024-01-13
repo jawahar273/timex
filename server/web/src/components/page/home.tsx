@@ -21,6 +21,7 @@ import {
 
 import { string } from "zod";
 import axios from "axios";
+import { Highlighter, HighlighterLang } from "../highlight";
 
 // import timexW, {
 //   showDetailInDisplay,
@@ -123,15 +124,15 @@ export default function Home() {
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="payload">
-                      {
+                      {/* {
                         orignal
-                      }
-                      {/* {orignal && (
+                      } */}
+                      {orignal && (
                         <Highlighter
                           content={orignal}
                           language={HighlighterLang.JSON}
                         />
-                      )} */}
+                      )}
                     </TabsContent>
                     <TabsContent value="calender">
                       <div>

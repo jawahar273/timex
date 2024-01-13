@@ -27,13 +27,17 @@ import {
 } from "@radix-ui/react-select";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { CalendarIcon } from "@radix-ui/react-icons";
+import { CalendarIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { cn } from "@timex/utils";
 import { format } from "date-fns";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
 import axios from "axios";
 import dayjs from "dayjs";
+import { useState } from "react";
+import _ from "lodash";
+import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
+import { string } from "zod";
 
 type DateProps = {
   setEvent: (details: SetEventType) => void;
@@ -85,6 +89,10 @@ function demoFill(data: TInputs) {
 }
 
 export function DateJsx(props: DateProps) {
+  
+  const [loading, setLoading] = useState(false);
+  const [errorObj, setHasError] = useState<Error>();
+  
   const form = useForm<TInputs>({
     defaultValues: {
       repeatEveryNumber: 1,
@@ -94,6 +102,7 @@ export function DateJsx(props: DateProps) {
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     // data.scheduledStartDateTime = typeof data.scheduledStartDateTime === 'date' ? data.scheduledStartDateTime.toISOString() : data.scheduledStartDateTime;
+    setLoading(true);
     const temp = demoFill(data);
     temp.scheduledStartDateTime = dayjs(temp.scheduledStartDateTime)
       .second(59)
@@ -101,38 +110,55 @@ export function DateJsx(props: DateProps) {
       .hour(11)
       .toDate();
 const API_DOMAIN = process.env.API_DOMAIN || 'http://localhost:8300'
-
-    const res = await axios.post<TimexEvent>(
-      new URL ( "/api/v1/schedule/", API_DOMAIN).href,
-      {
-        details: demoFill(data),
-        previousScheduleDate: dayjs(
-          dayjs(temp.scheduledStartDateTime)
-            .subtract(1, "day")
-            .format("YYYY-MM-DDT11:59:00.000Z")
-        ).toISOString(),
-        startDate: dayjs()
-          .startOf("month")
-          .add(1, "day")
-          .format("YYYY-MM-DDT00:00:00.000Z"),
-        endDate: dayjs()
-          .add(14, "months")
-          .endOf("month")
-          .format("YYYY-MM-DDT00:00:00.000Z"),
+try {
+  const res = await axios.post<TimexEvent>(
+    new URL ( "/api/v1/schedule/", API_DOMAIN).href,
+    {
+      details: demoFill(data),
+      previousScheduleDate: dayjs(
+        dayjs(temp.scheduledStartDateTime)
+          .subtract(1, "day")
+          .format("YYYY-MM-DDT11:59:00.000Z")
+      ).toISOString(),
+      startDate: dayjs()
+        .startOf("month")
+        .add(1, "day")
+        .format("YYYY-MM-DDT00:00:00.000Z"),
+      endDate: dayjs()
+        .add(14, "months")
+        .endOf("month")
+        .format("YYYY-MM-DDT00:00:00.000Z"),
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    props.setEvent({ events: res.data });
-    console.log(res);
+    }
+  );
+  props.setEvent({ events: res.data });
+  console.log(res);
+} catch (error) {
+  setHasError(error as any)
+} finally {
+  setLoading(false)
+}
+
   };
 
   // console.log("====", repeatEvery)
 
   return (
+    <div>
+  {
+    errorObj && 
+    <Alert variant="destructive">
+      <ExclamationTriangleIcon className="h-4 w-4" />
+      <AlertTitle>Error</AlertTitle>
+      <AlertDescription>
+        {String(errorObj)}
+      </AlertDescription>
+    </Alert>
+  }      
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pt-3">
         <FormField
@@ -221,8 +247,9 @@ const API_DOMAIN = process.env.API_DOMAIN || 'http://localhost:8300'
             </FormItem>
           )}
         /> */}
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={loading}>Submit</Button>
       </form>
     </Form>
+    </div>
   );
 }
