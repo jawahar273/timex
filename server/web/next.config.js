@@ -1,10 +1,15 @@
 const rewrites = () => {
-    return [
-        {
-            source: '/api/:path*',
-            destination: 'https://timex.up.railway.app/:path*'
-        }
-    ]
+    
+    if(process.env.NODE_ENV === 'production') {        
+        return [
+            {
+                source: '/api/:path*',
+                destination: 'https://timex.up.railway.app/api/:path*'
+            }
+        ]
+    } else {
+        return []
+    }
 }
 
 /** @type {import('next').NextConfig} */
