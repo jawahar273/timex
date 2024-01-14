@@ -134,7 +134,7 @@ export function DateJsx(props: DateProps) {
       .minute(59)
       .hour(11)
       .toDate();
-const API_DOMAIN = process.env.API_DOMAIN;
+const API_DOMAIN = 'https://timex.up.railway.app/';
 try {
   const res = await axios.post<TimexEvent>(
     new URL ( "/api/v1/schedule/", API_DOMAIN).href,
