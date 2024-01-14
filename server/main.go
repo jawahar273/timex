@@ -44,7 +44,7 @@ func main() {
 
 	v.SetDefault("GIN_MODE", DEVELOPMENT)
 	v.SetDefault("PORT", 8300)
-	v.SetDefault("R_HOST", "[::1]:50051")
+	v.SetDefault("R_HOST", "127.0.0.1:50051")
 
 	if v.GetString("GIN_MODE") == DEVELOPMENT {
 		log.Info().Msg("Development environment")

@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -31,7 +30,6 @@ func Get(ctx *gin.Context, c pbV1.MachineClient) {
 		endDate = form.Details.EndDate.Format(time.RFC3339)
 	}
 
-	fmt.Println("dates-->", form.PreviousScheduleDate.Format(time.RFC3339), endDate)
 	f, err := c.Send(context.TODO(), &pbV1.DetailRequest{
 		Details: &pbV1.ScheduleDetails{
 			ScheduledStartDateTime:  form.Details.ScheduledStartDateTime.Format(time.RFC3339),
@@ -65,11 +63,6 @@ func Get(ctx *gin.Context, c pbV1.MachineClient) {
 		return
 	}
 
-	fmt.Println(
-		"--------->",
-		f,
-	)
 	ctx.JSON(http.StatusOK, f)
-	return
 
 }
