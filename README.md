@@ -9,7 +9,7 @@ This Rust library allows you to generate date times based on a start and end dat
 
 https://github.com/jawahar273/timex/assets/7668497/841621b1-6325-4804-8dc3-cb5124c42a96
 
-Adding [iterative demo link](https://timex-demo.netlify.app/) which is based on the golang and rust with Grpc.
+Adding [interactive demo](https://timex-demo.netlify.app/) which is based on the golang and rust with Grpc.
 
 <!--
 ## Installation
