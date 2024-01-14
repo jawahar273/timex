@@ -140,7 +140,7 @@ func main() {
 	// [https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/notify-with-context/server.go]
 	go func() {
 		log.Info().Msg("start the server")
-
+		log.Info().Msgf("listen grpc at %s", v.GetString("R_HOST"))
 		grpcConn, err = GrpcClient(ctx, v.GetString("R_HOST"))
 		// pbV1.send
 
@@ -153,7 +153,7 @@ func main() {
 			apiV1,
 			c,
 		)
-
+		log.Info().Msg("start the listen")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Msgf("listen: %s\n", err)
 		}
