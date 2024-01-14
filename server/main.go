@@ -40,21 +40,21 @@ func main() {
 
 	// viper.SetDefault("GIN_MODE", constants.PRODUCTION)
 	viper.AutomaticEnv()
-	v := viper.New()
+	// viper := viper.New()
 
-	v.SetDefault("GIN_MODE", DEVELOPMENT)
-	v.SetDefault("PORT", 8300)
-	v.SetDefault("R_HOST", "127.0.0.1:50051")
+	viper.SetDefault("GIN_MODE", DEVELOPMENT)
+	viper.SetDefault("PORT", 8300)
+	viper.SetDefault("R_HOST", "127.0.0.1:50051")
 
-	if v.GetString("GIN_MODE") == DEVELOPMENT {
+	if viper.GetString("GIN_MODE") == DEVELOPMENT {
 		log.Info().Msg("Development environment")
 
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	log.Info().Msgf("env: %s", v.GetString("GIN_MODE"))
+	log.Info().Msgf("env: %s", viper.GetString("GIN_MODE"))
 
-	var port = v.GetInt("PORT")
+	var port = viper.GetInt("PORT")
 	log.Info().Msgf("server run the port %v", port)
 
 	// Create context that listens for the interrupt signal from the OS.
@@ -82,7 +82,7 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}
 
-	if v.GetString("GIN_MODE") == DEVELOPMENT {
+	if viper.GetString("GIN_MODE") == DEVELOPMENT {
 		docs.SwaggerInfo.BasePath = "/api/"
 
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -140,8 +140,8 @@ func main() {
 	// [https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/notify-with-context/server.go]
 	go func() {
 		log.Info().Msg("start the server")
-		log.Info().Msgf("listen grpc at %s", v.GetString("R_HOST"))
-		grpcConn, err = GrpcClient(ctx, v.GetString("R_HOST"))
+		log.Info().Msgf("listen grpc at %s", viper.GetString("R_HOST"))
+		grpcConn, err = GrpcClient(ctx, viper.GetString("R_HOST"))
 		// pbV1.send
 
 		if err != nil {
