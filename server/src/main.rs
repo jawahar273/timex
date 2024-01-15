@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::Serialize;
-use serde_json::{self, json, Value};
+use serde_json::{self};
 use std::env;
 use std::{fmt, net::SocketAddr, time::Duration};
 use timex::model::{

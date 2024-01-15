@@ -1,13 +1,11 @@
 
-
 # Timex: Schedule Date Time Generator
 
 This Rust library allows you to generate date times based on a start and end date, along with other parameters. It utilizes the chrono crate for date and time manipulations.
 
 ## Demo
 
-
-https://github.com/jawahar273/timex/assets/7668497/841621b1-6325-4804-8dc3-cb5124c42a96
+<https://github.com/jawahar273/timex/assets/7668497/841621b1-6325-4804-8dc3-cb5124c42a96>
 
 Adding [interactive demo](https://timex-demo.netlify.app/) which is based on the golang and rust with Grpc.
 
