@@ -108,6 +108,7 @@ pub fn add_repeat_time(
     }
 }
 
+#[derive(Debug)]
 pub struct CTemp {
     pub job_details: ScheduleDetails,
     pub range_date: (DateTime<Utc>, DateTime<Utc>),
@@ -115,7 +116,8 @@ pub struct CTemp {
     // original_schedule: DateTime<Utc>,
 }
 
-pub fn common_para_for_test(sc: &str) -> CTemp{
+/// This function will make sure happy flow argument are generated
+pub fn generate_happy_flow_arguments(sc: &str) -> CTemp{
     let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
     let original_schedule =
         chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time)
@@ -128,10 +130,12 @@ pub fn common_para_for_test(sc: &str) -> CTemp{
     );
 
     let range_date = get_start_end_date_month();
-    return CTemp{
+    let result = CTemp{
         job_details,
         range_date,
         scheduled_start_date_time,
         // original_schedule
     };
+    dbg!(&result);
+    return result;
 }

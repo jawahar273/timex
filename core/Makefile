@@ -1,5 +1,9 @@
+.PHONY: coverage
 coverage:
-	cargo tarpaulin --out html --output-dir ./coverage --engine llvm
+	cargo tarpaulin --out html \
+		--output-dir ./coverage/dev \
+		# --engine llvm \
+		--count 
 
 add-wasm:
 	rustup target add wasm32-wasi 

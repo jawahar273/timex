@@ -123,7 +123,7 @@ pub fn for_week(
         return Ok(Vec::new());
     }
 
-    let week_days_for_repeat_every: Vec<String> =
+    let week_days_for_repeat_every: Vec<WeekDayForMonth> =
         detail.week_days_for_repeat_every.clone().unwrap();
 
     let mut result: Vec<DateTime<Utc>> = vec![];
@@ -141,8 +141,7 @@ pub fn for_week(
 
     for week_day in 0..week_days_for_repeat_every.len() {
         let w = &week_days_for_repeat_every[week_day]
-            .parse::<Weekday>()
-            .unwrap();
+            .to_chrono();
 
         let u = get_week_bounded_days_for_given_date(&schedule_start);
         let num = w.num_days_from_monday() as usize;

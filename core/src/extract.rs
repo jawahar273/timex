@@ -1,3 +1,4 @@
+use crate::model::WeekDayForMonth;
 use crate::utils::{
     check_date_with_given_range,
     concat_time,
@@ -48,7 +49,7 @@ fn get_end_option_after_based_on_repeat(
             let result =
                 check_date_with_given_range(&possible_date, &start_range_date, &end_range_date);
 
-            if result || allow_max_occurrences.unwrap_or(true) {
+            if result || allow_max_occurrences.unwrap_or(false) {
                 Ok(possible_date)
             } else {
                 Ok(*end_range_date)
@@ -61,7 +62,7 @@ fn get_end_option_after_based_on_repeat(
             let result =
                 check_date_with_given_range(&possible_date, &start_range_date, &end_range_date);
 
-            if result || allow_max_occurrences.unwrap_or(true) {
+            if result || allow_max_occurrences.unwrap_or(false) {
                 Ok(possible_date)
             } else {
                 Ok(*end_range_date)
@@ -231,7 +232,7 @@ pub fn for_details(
         return Ok(Vec::new());
     }
 
-    let mut result = Vec::new();
+    // let mut result = Vec::new();
 
     match detail.repeat_every {
         RepeatEvery::Day => {
@@ -245,23 +246,20 @@ pub fn for_details(
         }
         RepeatEvery::Week => {
 
-            let week_days_for_repeat_every: Vec<String> =
+            let week_days_for_repeat_every: Vec<WeekDayForMonth> =
                 match detail.week_days_for_repeat_every.clone().is_none() {
                     true => vec![],
                     false => detail.week_days_for_repeat_every.clone().unwrap(),
                 };
         
             if week_days_for_repeat_every.len() >= 1 {
-                for week_day in 0..week_days_for_repeat_every.len() {
-                    let w = &week_days_for_repeat_every[week_day]
-                        .parse::<Weekday>()
-                        .unwrap();
 
-                    let u = get_week_bounded_days_for_given_date(&schedule_start);
-                    let num = w.num_days_from_monday() as usize;
-                    result.push(u[num]);
-                }
-                return Ok(result);
+                return week_day_loop(
+                    detail,
+                    &schedule_start,
+                    &end_date,
+                    week_days_for_repeat_every,
+                );
             } else {
                 return non_stop(
                     detail,
@@ -324,4 +322,30 @@ fn non_stop(
         scheduled_start_date_time,
     ));
     Ok(result)
+}
+
+
+fn week_day_loop(
+    detail: &ScheduleDetails,
+    _schedule_start: &DateTime<Utc>,
+    end_date: &DateTime<Utc>,
+    week_days_for_repeat_every: Vec<WeekDayForMonth>,
+) -> Result<Vec<DateTime<Utc>>> {
+    let mut result = Vec::new();
+    let mut schedule_start: DateTime<Utc> = *_schedule_start;
+
+    let diff = num_diff_i64(detail, &schedule_start, &end_date);
+    for _ in 0..diff {        
+        for week_day in 0..week_days_for_repeat_every.len() {
+            let w = &week_days_for_repeat_every[week_day]
+                .to_chrono();
+
+            let u = get_week_bounded_days_for_given_date(&schedule_start);
+            let num = w.num_days_from_monday() as usize;
+            result.push(u[num]);
+        }
+        schedule_start = *get_schedule_start(detail, &schedule_start)?;
+    }
+   return Ok(result);
+    
 }

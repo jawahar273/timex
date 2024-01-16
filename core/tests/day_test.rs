@@ -1,16 +1,14 @@
 use crate::common::{
     assert_diff_between_dates_with_repeated_time,
-    get_start_end_date_week,
-    num_of_diff, common_para_for_test,
+    num_of_diff,
+    generate_happy_flow_arguments,
 };
-use chrono::{DateTime, Days, Duration, Timelike, Utc};
-use common::add_repeat_time;
-use timex::model::ScheduleDetails;
+use chrono::{DateTime, Duration, Timelike, Utc};
+
 use timex::{
     schedule_date_times,
-    unstable_for_details,
     for_days as unstable_for_days,
-    unstable_get_start_and_last_date_of_month_for_given_date as get_start_and_last_date_of_month_for_given_date,
+    model::ScheduleDetails,
 };
 #[path = "./common.rs"]
 mod common;
@@ -75,6 +73,8 @@ fn it_day_today() {
     // println!("{result}");
 }
 
+
+
 #[test]
 fn it_daily_never_stop() {
     let sc = r#"
@@ -87,7 +87,7 @@ fn it_daily_never_stop() {
    "#;
 
    
-   let t = common_para_for_test(
+   let t = generate_happy_flow_arguments(
     sc,
 );
 
@@ -124,7 +124,7 @@ fn it_daily_never_stop_repeat_every_2() {
     }
    "#;
 
-   let t = common_para_for_test(
+   let t = generate_happy_flow_arguments(
     sc,
 );
 
@@ -160,7 +160,7 @@ fn it_daily_stop_n_occurrence() {
     }
    "#;
 
-   let t = common_para_for_test(
+   let t = generate_happy_flow_arguments(
     sc,
 );
 
@@ -201,7 +201,7 @@ fn it_daily_with_end_date() {
     }
    "#;
 
-   let t = common_para_for_test(
+   let t = generate_happy_flow_arguments(
     sc,
 );
 
@@ -210,6 +210,7 @@ let mut job_details = t.job_details;
 // let original_schedule = t.original_schedule;
 let scheduled_start_date_time = t.scheduled_start_date_time;
 
+// Setting end date here not on the json
     job_details.end_date = Some(range_date.1.to_rfc3339());
     let end_Date = range_date.1;
 

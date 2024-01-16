@@ -252,7 +252,7 @@ pub struct ScheduleDetails {
     pub occurrence_value: Option<u64>,
 
     #[serde(rename = "weekDaysForRepeatEvery")]
-    pub week_days_for_repeat_every: Option<Vec<String>>,
+    pub week_days_for_repeat_every: Option<Vec<WeekDayForMonth>>,
 
     #[serde(rename = "monthOptions")]
     pub month_options: Option<MonthOptions>,
@@ -297,9 +297,10 @@ impl fmt::Display for ScheduleDetails {
                 self.repeat_every.to_string()
             );
             if week_days_for_repeat_every.len() >= 2 {
+                let convert_to_strings: Vec<String> = week_days_for_repeat_every[0..week_days_for_repeat_every.len() - 2].into_iter().map(|x| x.to_string()).collect();
                 every = format!(
                     "{} and {}",
-                    week_days_for_repeat_every[0..week_days_for_repeat_every.len() - 2].join(", "),
+                    convert_to_strings.join(","),
                     week_days_for_repeat_every[week_days_for_repeat_every.len() - 1]
                 );
             } else if week_days_for_repeat_every.len() == 1 {
