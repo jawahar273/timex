@@ -1,14 +1,14 @@
 use crate::common::{
     assert_diff_between_dates_with_repeated_time,
-    num_of_diff,
+    num_of_diff_for_repeat_every,
     generate_happy_flow_arguments,
 };
-use chrono::{DateTime, Duration, Timelike, Utc};
+use chrono::{DateTime, Duration, Timelike, Utc, Month, Months};
 
 use timex::{
     schedule_date_times,
     for_days as unstable_for_days,
-    model::ScheduleDetails,
+    model::{ScheduleDetails, RepeatEvery},
 };
 #[path = "./common.rs"]
 mod common;
@@ -189,6 +189,7 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
     // assert_eq!(t.len() as u64, job_details.occurrence_value.unwrap());
 }
 
+
 #[test]
 fn it_daily_with_end_date() {
     let sc = r#"
@@ -212,7 +213,7 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
 
 // Setting end date here not on the json
     job_details.end_date = Some(range_date.1.to_rfc3339());
-    let end_Date = range_date.1;
+    let end_date = range_date.1;
 
     let actual = schedule_date_times(
         &job_details,
@@ -231,8 +232,8 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
     dbg!(&actual);
 
 
-    let i = num_of_diff(
-        &(end_Date - scheduled_start_date_time),
+    let i = num_of_diff_for_repeat_every(
+        &(end_date - scheduled_start_date_time),
         &job_details.repeat_every,
         &scheduled_start_date_time,
     );
@@ -244,6 +245,61 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
     );
 
     assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
+
+}
+
+
+
+fn generate_end_date(repeatEvery: RepeatEvery, end_date: DateTime<Utc>) -> DateTime<Utc> {
+    match  repeatEvery {
+        RepeatEvery::Day => {
+            end_date - Duration::days(1)
+        },
+        RepeatEvery::Week => {
+            end_date - Duration::weeks(1)
+        },
+        RepeatEvery::Month => {
+            end_date - Months::new(1)
+        },
+        RepeatEvery::Year => todo!(),
+    }
+}
+
+#[test]
+fn it_daily_with_end_day_2() {
+    let sc = r#"
+   {
+      "scheduledStartDateTime": "2023-12-14T06:54:20.447Z",
+      "repeatEveryNumber": 2,
+      "repeatEvery": "day",
+      "endOption": "onThe",
+      "endDate": "2024-01-01T18:29:59.999Z"
+    }
+   "#;
+
+   let t = generate_happy_flow_arguments(
+    sc,
+);
+
+let range_date = t.range_date;
+let mut job_details = t.job_details;
+// let original_schedule = t.original_schedule;
+let scheduled_start_date_time = t.scheduled_start_date_time;
+
+// Setting end date here not on the json
+    job_details.end_date = Some(range_date.1.to_rfc3339());
+    let end_date = generate_end_date(job_details.repeat_every, range_date.1);
+    dbg!(&range_date);
+    dbg!(&end_date);
+    let actual = schedule_date_times(
+        &job_details,
+        scheduled_start_date_time,
+        range_date.0,
+        range_date.1,
+    )
+    .unwrap();
+
+    dbg!(&actual);
 
 }
 

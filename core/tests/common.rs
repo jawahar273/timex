@@ -38,7 +38,7 @@ pub fn get_start_end_date_year() -> (DateTime<Utc>, DateTime<Utc>) {
     (a.0, d.1)
 }
 
-pub fn num_of_diff(
+pub fn num_of_diff_for_repeat_every(
     diff_duration: &Duration,
     repeat_every: &RepeatEvery,
     previous_scheduled_start: &DateTime<Utc>,
@@ -74,7 +74,7 @@ pub fn assert_diff_between_dates_with_repeated_time(
 
     for inx in 1..actual_dates.len() {
         let diff_duration = actual_dates[inx] - previous_date;
-        let num_diff = num_of_diff(
+        let num_diff = num_of_diff_for_repeat_every(
             &diff_duration,
             &details.repeat_every,
             previous_scheduled_start,

@@ -244,19 +244,34 @@ pub struct ScheduleDetails {
     /// - Should the recurrent stop at the given date [`EndOption::OnThe`]
     #[serde(rename = "endOption")]
     pub end_option: EndOption,
-
+    
+    /// End date to stop the schedule date generated
     #[serde(rename = "endDate")]
     pub end_date: Option<String>,
-
+    
+    /// Number of time the schedule generate
     #[serde(rename = "occurrenceValue")]
     pub occurrence_value: Option<u64>,
-
+    
+    /// List of week days [`WeekDayForMonth`]
     #[serde(rename = "weekDaysForRepeatEvery")]
     pub week_days_for_repeat_every: Option<Vec<WeekDayForMonth>>,
-
+    
+    /// WIP
     #[serde(rename = "monthOptions")]
     pub month_options: Option<MonthOptions>,
-
+    
+    /// schedule the date for the given day.
+    /// 
+    /// - For example if value set to `5` the date will generated
+    ///     as `2023-11-05T00:00:00.00Z`.
+    /// - If the value is get to 31 the end date for the month will be always
+    /// has correct end date month. For example January => 31, February => 28/29(accordingly to leap year), March => 31, April => 30
+    /// 
+    /// # Panics
+    /// 
+    /// If the value is greater than or equal 32 [`crate::errors::ScheduleError::DaysWithMoreThan31AreNotAllowed`]
+    /// panic will be thrown
     #[serde(rename = "onDayValueForMonth")]
     pub on_day_value_for_month: Option<i64>,
 

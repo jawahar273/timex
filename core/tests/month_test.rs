@@ -2,7 +2,7 @@
 
 use crate::common::{
     assert_diff_between_dates_with_repeated_time, 
-    get_start_end_date_month, num_of_diff, get_start_end_date_year,
+    get_start_end_date_month, num_of_diff_for_repeat_every as num_of_diff, get_start_end_date_year,
 };
 use anyhow::bail;
 use chrono::{Utc, DateTime, TimeZone, Datelike};

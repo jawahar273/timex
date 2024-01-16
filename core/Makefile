@@ -10,4 +10,6 @@ add-wasm:
 
 wasm:
 	cargo build --target wasm32-wasi
-	
+
+docs:
+	cargo doc --open --no-deps
