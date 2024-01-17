@@ -274,10 +274,13 @@ pub struct ScheduleDetails {
     /// panic will be thrown
     #[serde(rename = "onDayValueForMonth")]
     pub on_day_value_for_month: Option<i64>,
-
+        
+    /// Order on which week to mark as schedule date-time
+    /// - First week, ... Last week
     #[serde(rename = "dayCategoryForMonth")]
     pub day_category_for_month: Option<DayCategoryFor>,
-
+    
+    /// Similar to [`week_days_for_repeat_every`]
     #[serde(rename = "weekDayForMonth")]
     pub week_day_for_month: Option<WeekDayForMonth>,
 

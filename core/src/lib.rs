@@ -22,6 +22,8 @@ pub use self::utils::{
 
 pub use self::days::for_days;
 pub use self::extract::for_details as unstable_for_details;
+pub use self::months::for_month;
+pub use self::weeks::for_week;
 
 mod days;
 mod extract;
@@ -62,18 +64,7 @@ fn generate_schedule_date_time(
         model::RepeatEvery::Year => todo!(),
     };
     t
-    // match t {
-    //     Ok(v) => {
-    //         let r = v
-    //             .into_iter()
-    //             .map(|x| concat_time(x, previous_scheduled_date))
-    //             .collect::<Vec<_>>();
-    //         dbg!(&r);
-    //         dbg!(&previous_scheduled_date);
-    //         Ok(r)
-    //     }
-    //     Err(e) => Err(e),
-    // }
+
 }
 
 pub fn schedule_date_times(
