@@ -8,6 +8,7 @@ install:
 	echo "install web"
 	cd ./server/web && nvm use && npm install
 
+	
 r.app:
 	cd ./server/ &&\
 	cargo run

@@ -13,3 +13,8 @@ wasm:
 
 docs:
 	cargo doc --open --no-deps
+
+init-dep:
+	cargo install cargo-audit
+	cargo install cargo-tarpaulin 
+	# cargo install flamegraph
