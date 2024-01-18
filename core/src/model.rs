@@ -19,6 +19,7 @@ pub enum RepeatEvery {
 #[serde(rename_all = "camelCase")]
 pub enum MonthOptions {
     #[serde(rename = "onThe")]
+    // On the given end date
     OnThe,
 
     #[serde(rename = "onDay")]
@@ -161,6 +162,7 @@ impl DayCategoryFor {
 
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Copy)]
+/// List of weekday in a week
 pub enum WeekDayForMonth {
     #[serde(rename = "monday")]
     Monday,
@@ -280,7 +282,7 @@ pub struct ScheduleDetails {
     #[serde(rename = "dayCategoryForMonth")]
     pub day_category_for_month: Option<DayCategoryFor>,
     
-    /// Similar to [`week_days_for_repeat_every`]
+    /// Similar to [`ScheduleDetails::week_days_for_repeat_every`]
     #[serde(rename = "weekDayForMonth")]
     pub week_day_for_month: Option<WeekDayForMonth>,
 

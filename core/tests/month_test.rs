@@ -5,7 +5,7 @@ use crate::common::{
     get_start_end_date_month, num_of_diff_for_repeat_every as num_of_diff, get_start_end_date_year,
 };
 use anyhow::bail;
-use chrono::{Utc, DateTime, TimeZone, Datelike};
+use chrono::{Utc, DateTime, TimeZone, Datelike, Duration};
 use common::generate_happy_flow_arguments as common_para_for_test;
 use timex::model::ScheduleDetails;
 use timex::{schedule_date_times, for_month as unstable_for_month};
@@ -320,17 +320,7 @@ fn it_month_end_date_special_case() {
 
 
 
-// {
-//     "scheduledStartDateTime": "2024-01-08T05:28:58.508Z",
-//     "repeatEveryNumber": 1,
-//     "repeatEvery": "month",
-//     "endOption": "onThe",
-//     "endDate": "2024-01-31T18:29:59.999Z",
-//     "monthOptions": "onThe",
-//     "dayCategoryForMonth": "first",
-//     "weekDayForMonth": "monday",
-//     "##": "Occur every month on first Monday starting on 2024/01/08 10:58 until 2024/01/31"
-//   }
+
 
 
 

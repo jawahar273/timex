@@ -116,7 +116,7 @@ pub struct CTemp {
     // original_schedule: DateTime<Utc>,
 }
 
-/// This function will make sure happy flow argument are generated
+/// This function will make sure happy-flow argument are generated
 pub fn generate_happy_flow_arguments(sc: &str) -> CTemp{
     let job_details: ScheduleDetails = serde_json::from_str(sc).unwrap();
     let original_schedule =

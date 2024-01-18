@@ -3,7 +3,7 @@ use crate::common::{
     num_of_diff_for_repeat_every,
     generate_happy_flow_arguments,
 };
-use chrono::{DateTime, Duration, Timelike, Utc, Month, Months};
+use chrono::{DateTime, Duration, Timelike, Utc, Month, Months, TimeZone, Datelike};
 
 use timex::{
     schedule_date_times,
@@ -31,14 +31,15 @@ fn assert_with_old_api(
         Some(true),
     ).unwrap();
 
-    dbg!(&actual);
-    dbg!(&actual2);
+    // dbg!(&actual);
+    // dbg!(&actual2);
     assert_eq!(actual, &actual2, "new api wrong value",); 
 }
 
 
+/// Just run for one
 #[test]
-fn it_day_today() {
+fn it_for_only_one_day() {
     let t = r#"
    {
       "scheduledStartDateTime": "2023-12-14T08:00:44.939Z",
@@ -50,7 +51,7 @@ fn it_day_today() {
     let job_details: ScheduleDetails = serde_json::from_str(&t).unwrap();
     // let scheduled_start_date_time = chrono::DateTime::parse_from_rfc3339(&job_details.scheduled_start_date_time).unwrap().with_timezone(&Utc);
     let scheduled_start_date_time = Utc::now();
-
+    
     let range_date = Utc::now()
         .with_hour(0)
         .unwrap()
@@ -303,3 +304,42 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
 
 }
 
+#[test]
+fn it_half_of_day() {
+    let sc = r#"
+        {
+            "scheduledStartDateTime": "2023-12-14T06:54:20.447Z",
+            "repeatEveryNumber": 1,
+            "repeatEvery": "day",
+            "endOption": "onThe",
+            "endDate": "2024-01-01T18:29:59.999Z"
+        }
+    "#;
+
+   
+    let t = generate_happy_flow_arguments(
+        sc,
+    );
+    
+    let range_date = t.range_date;
+    let mut job_details = t.job_details;
+    // let original_schedule = t.original_schedule;
+    let scheduled_start_date_time = t.scheduled_start_date_time;
+    job_details.end_date = Some(range_date.1.to_rfc3339());
+
+        dbg!(&range_date.0);
+        dbg!(&(range_date.1));
+        dbg!(Utc.with_ymd_and_hms(range_date.1.year(), range_date.1.month(), 15, 0, 0, 0).unwrap());
+    
+        let actual = schedule_date_times(
+            &job_details,
+            scheduled_start_date_time,
+            range_date.0,
+            Utc.with_ymd_and_hms(range_date.1.year(), range_date.1.month(), 15, 0, 0, 0).unwrap(),
+        )
+        .unwrap();
+    
+        dbg!(&actual);
+
+    
+}

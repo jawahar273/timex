@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use crate::model::WeekDayForMonth;
 use crate::utils::{
     check_date_with_given_range,
@@ -21,7 +23,7 @@ use chrono::{
     Datelike, Days,
     Duration, Months,
     TimeZone, Timelike,
-    Utc, Weekday,
+    Utc,
 };
 
 use log::info;
@@ -88,7 +90,6 @@ fn get_end_option_after_based_on_repeat(
 
 fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTime<Utc> {
     let y = get_start_and_last_date_of_month_for_given_date(&scheduled_date);
-    let start_date_of_month = y.0;
     let end_date_of_month = y.1;
     let on_day_value_for_month = detail.on_day_value_for_month.unwrap_or(0) as u32;
 
@@ -210,13 +211,27 @@ pub fn for_details(
             allow_max_occurrences,
         )?,
         model::EndOption::OnThe => {
-            let t = DateTime::parse_from_rfc3339(
+            
+            let end_date = DateTime::parse_from_rfc3339(
                 // detail.end_date.as_ref().unwrap().as_str()
                 detail.end_date.as_ref().unwrap().as_str(),
             )?
             .with_timezone(&Utc);
-            dbg!(t);
-            t
+        
+            match end_range_date.cmp(&end_date) {
+                Ordering::Equal => {
+                    end_date
+                },
+                Ordering::Greater => {
+                    end_date
+                }
+                Ordering::Less => {
+                    // when future date
+                    end_range_date
+                }
+            }
+            // dbg!(t);
+            // end_date
         }
         model::EndOption::Never => end_range_date,
     };
@@ -257,6 +272,7 @@ pub fn for_details(
                 return week_day_loop(
                     detail,
                     &schedule_start,
+                    &scheduled_start_date_time,
                     &end_date,
                     week_days_for_repeat_every,
                 );
@@ -328,6 +344,7 @@ fn non_stop(
 fn week_day_loop(
     detail: &ScheduleDetails,
     _schedule_start: &DateTime<Utc>,
+    scheduled_start_date_time: &DateTime<Utc>,
     end_date: &DateTime<Utc>,
     week_days_for_repeat_every: Vec<WeekDayForMonth>,
 ) -> Result<Vec<DateTime<Utc>>> {
@@ -342,10 +359,17 @@ fn week_day_loop(
 
             let u = get_week_bounded_days_for_given_date(&schedule_start);
             let num = w.num_days_from_monday() as usize;
-            result.push(u[num]);
+            result.push(
+                post_processing_output(
+                    detail,
+                    &u[num],
+                    scheduled_start_date_time,
+                )
+            );
         }
         schedule_start = *get_schedule_start(detail, &schedule_start)?;
     }
+
    return Ok(result);
     
 }
