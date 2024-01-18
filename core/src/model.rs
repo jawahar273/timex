@@ -143,9 +143,6 @@ impl DayCategoryFor {
             Self::Third => "third".to_string(),
             Self::Fourth => "fourth".to_string(),
             Self::Last => "last".to_string(),
-            _ => {
-                panic!("unexpected option")
-            }
         }
     }
 

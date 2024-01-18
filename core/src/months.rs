@@ -48,7 +48,8 @@ fn find_all_weekday_for_give_month(
     result
 }
 
-fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTime<Utc> {
+#[deprecated(since = "0.2.0", note = "duplicate logic")]
+fn unstable_set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTime<Utc> {
     let y = get_start_and_last_date_of_month_for_given_date(&scheduled_date);
     let end_date_of_month = y.1;
 
@@ -153,14 +154,67 @@ pub fn for_month(
         let mut temp = Vec::new();
 
         for _ in 0..diff.months {
-            temp.push(set_date(detail, &schedule_for));
+            temp.push(unstable_set_date(detail, &schedule_for));
             schedule_for = schedule_for + Months::new(repeat_times as u32);
         }
 
-        temp.push(set_date(detail, &schedule_for));
+        temp.push(unstable_set_date(detail, &schedule_for));
 
         return Ok(temp);
     }
 
     return Ok(Vec::new());
+}
+
+
+pub fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTime<Utc> {
+    let y = get_start_and_last_date_of_month_for_given_date(&scheduled_date);
+    let end_date_of_month = y.1;
+    let on_day_value_for_month = detail.on_day_value_for_month.unwrap_or(0) as u32;
+
+    let mut day = detail.on_day_value_for_month.unwrap_or(0) as u32;
+
+    if day >= end_date_of_month.day() {
+        day = end_date_of_month.day();
+    } else {
+        day = scheduled_date.day();
+        
+        // when it has week days date are change accounting to select week day date
+        if detail.week_day_for_month.is_some() {
+            let temp = find_all_weekday_for_give_month(
+                scheduled_date,
+                detail.week_day_for_month.as_ref().unwrap(),
+            );
+            let y = detail
+                .day_category_for_month
+                .as_ref()
+                .unwrap()
+                .to_week_in_month();
+            // dbg!(&scheduled_date);
+            // dbg!(&y);
+            // dbg!(&temp);
+            // dbg!(&temp.get(y as usize));
+
+            let i = match y {
+                -1 => temp.last(),
+                v => temp.get(v as usize),
+            };
+
+            day = i.unwrap().day();
+        } else if on_day_value_for_month > end_date_of_month.day() {
+            day = end_date_of_month.day();
+        } else if on_day_value_for_month <= end_date_of_month.day() {
+            day = on_day_value_for_month
+        }
+    }
+
+    Utc.with_ymd_and_hms(
+        scheduled_date.year(),
+        scheduled_date.month(),
+        day as u32,
+        scheduled_date.hour(),
+        scheduled_date.minute(),
+        scheduled_date.second(),
+    )
+    .unwrap()
 }

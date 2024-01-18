@@ -36,7 +36,10 @@ timex = "0.0.1"
 
 ```rust
 
-use timex::{schedule_date_times, ScheduleDetails};
+use timex::{
+    schedule_date_times,
+    model::ScheduleDetails
+};
 use chrono::{DateTime, Utc};
 
 fn main() {
@@ -64,12 +67,12 @@ fn main() {
                         .unwrap()
                         .with_timezone(&Utc);
     let result = schedule_date_times(
-        job_details,
+        &job_details,
         previous_scheduled_date,
         start_range,
         end_range,
     );
-    dgb!(&result);
+    println!("{:?}",&result.unwrap());
     // &result = [
     //     2024-01-05T08:28:46Z,
     //     2024-01-06T08:28:46Z,

@@ -251,8 +251,8 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
 
 
 
-fn generate_end_date(repeatEvery: RepeatEvery, end_date: DateTime<Utc>) -> DateTime<Utc> {
-    match  repeatEvery {
+fn generate_end_date(repeat_every: RepeatEvery, end_date: DateTime<Utc>) -> DateTime<Utc> {
+    match  repeat_every {
         RepeatEvery::Day => {
             end_date - Duration::days(1)
         },

@@ -1,40 +1,32 @@
 use std::cmp::Ordering;
 
 use crate::model::WeekDayForMonth;
+
 use crate::utils::{
     check_date_with_given_range,
     concat_time,
-    get_start_and_last_date_of_month_for_given_date,
-    get_week_bounded_days_for_given_date,
-    num_diff_i64
+    num_diff_i64,
+    get_week_bounded_days_for_given_date
 };
 use crate::{
-    errors::ScheduleError,
     model::{
         self,
         RepeatEvery,
         ScheduleDetails
     },
-    weeks::find_all_weekday_for_give_month
+    months::set_date,
+    preprocessor::simple_preprocessing,
 };
-use anyhow::{bail, Ok, Result};
+use anyhow::{ Ok, Result};
 use chrono::{
     offset, DateTime,
-    Datelike, Days,
+    Days,
     Duration, Months,
-    TimeZone, Timelike,
     Utc,
 };
 
 use log::info;
 
-
-// fn non_stop_repeat_every_time(detail: &ScheduleDetails) -> bool {
-//     if detail.end_option == model::EndOption::Never {
-//         return true;
-//     }
-//     false
-// }
 
 fn get_end_option_after_based_on_repeat(
     detail: &ScheduleDetails,
@@ -88,77 +80,27 @@ fn get_end_option_after_based_on_repeat(
     }
 }
 
-fn set_date(detail: &ScheduleDetails, scheduled_date: &DateTime<Utc>) -> DateTime<Utc> {
-    let y = get_start_and_last_date_of_month_for_given_date(&scheduled_date);
-    let end_date_of_month = y.1;
-    let on_day_value_for_month = detail.on_day_value_for_month.unwrap_or(0) as u32;
 
-    let mut day = detail.on_day_value_for_month.unwrap_or(0) as u32;
-
-    if day >= end_date_of_month.day() {
-        day = end_date_of_month.day();
-    } else {
-        day = scheduled_date.day();
-        
-        // when it has week days date are change accounting to select week day date
-        if detail.week_day_for_month.is_some() {
-            let temp = find_all_weekday_for_give_month(
-                scheduled_date,
-                detail.week_day_for_month.as_ref().unwrap(),
-            );
-            let y = detail
-                .day_category_for_month
-                .as_ref()
-                .unwrap()
-                .to_week_in_month();
-            // dbg!(&scheduled_date);
-            // dbg!(&y);
-            // dbg!(&temp);
-            // dbg!(&temp.get(y as usize));
-
-            let i = match y {
-                -1 => temp.last(),
-                v => temp.get(v as usize),
-            };
-
-            day = i.unwrap().day();
-        } else if on_day_value_for_month > end_date_of_month.day() {
-            day = end_date_of_month.day();
-        } else if on_day_value_for_month <= end_date_of_month.day() {
-            day = on_day_value_for_month
-        }
-    }
-
-    Utc.with_ymd_and_hms(
-        scheduled_date.year(),
-        scheduled_date.month(),
-        day as u32,
-        scheduled_date.hour(),
-        scheduled_date.minute(),
-        scheduled_date.second(),
-    )
-    .unwrap()
-}
 
 fn get_schedule_start(
     detail: &ScheduleDetails,
-    scheduled_start_date_time: &DateTime<Utc>,
+    scheduled_date: &DateTime<Utc>,
 ) -> Result<Box<DateTime<Utc>>, anyhow::Error> {
     match detail.repeat_every {
         RepeatEvery::Day => {
             return Ok(Box::new(
-                *scheduled_start_date_time + Days::new(detail.repeat_every_number.try_into()?),
+                *scheduled_date + Days::new(detail.repeat_every_number.try_into()?),
             ));
         }
         RepeatEvery::Week => {
             return Ok(Box::new(
-                *scheduled_start_date_time
+                *scheduled_date
                     + Duration::weeks(detail.repeat_every_number.try_into()?),
             ));
         }
         RepeatEvery::Month => {
             return Ok(Box::new(
-                *scheduled_start_date_time + Months::new(detail.repeat_every_number.try_into()?),
+                *scheduled_date + Months::new(detail.repeat_every_number.try_into()?),
             ));
         }
         RepeatEvery::Year => todo!(),
@@ -179,30 +121,15 @@ fn get_schedule_start(
 /// given
 pub fn for_details(
     detail: &ScheduleDetails,
-    scheduled_start_date_time: DateTime<Utc>,
+    previous_scheduled_date: DateTime<Utc>,
     start_range_date: DateTime<Utc>,
     end_range_date: DateTime<Utc>,
     allow_max_occurrences: Option<bool>,
 ) -> Result<Vec<DateTime<Utc>>> {
+    
+    simple_preprocessing(detail)?;
 
-    // preprocessing step
-    match detail.repeat_every {
-        RepeatEvery::Day => {
-            if detail.repeat_every_number >= 32 {
-                bail!(ScheduleError::DaysWithMoreThan31AreNotAllowed());
-            }
-        }
-        RepeatEvery::Week => {}
-        RepeatEvery::Month => {
-            if detail.on_day_value_for_month.is_some()
-                && detail.on_day_value_for_month.unwrap() >= 32
-            {
-                bail!(ScheduleError::DaysWithMoreThan31AreNotAllowed());
-            }
-        }
-        RepeatEvery::Year => {}
-    }
-
+    // End date equivalent to stop at this date
     let end_date: DateTime<Utc> = match detail.end_option {
         model::EndOption::After => get_end_option_after_based_on_repeat(
             detail,
@@ -236,25 +163,25 @@ pub fn for_details(
         model::EndOption::Never => end_range_date,
     };
 
-    let schedule_start: DateTime<Utc> =
-        *get_schedule_start(detail, &scheduled_start_date_time)?;
-    dbg!(&schedule_start);
+    let schedule_at: DateTime<Utc> = *get_schedule_start(
+        detail,
+        &previous_scheduled_date
+    )?;
+
     let is_with_in_range =
-        check_date_with_given_range(&schedule_start, &start_range_date, &end_range_date);
+        check_date_with_given_range(&schedule_at, &start_range_date, &end_range_date);
 
     if !is_with_in_range {
-        info!("scheduled date '{schedule_start}'  range not with given of '{start_range_date}' and '{end_range_date}'");
+        info!("scheduled date '{schedule_at}'  range not with given of '{start_range_date}' and '{end_range_date}'");
         return Ok(Vec::new());
     }
-
-    // let mut result = Vec::new();
 
     match detail.repeat_every {
         RepeatEvery::Day => {
             let result = non_stop(
                 detail,
-                &scheduled_start_date_time,
-                schedule_start,
+                &previous_scheduled_date,
+                schedule_at,
                 &end_date,
             );
             return result;
@@ -271,16 +198,16 @@ pub fn for_details(
 
                 return week_day_loop(
                     detail,
-                    &schedule_start,
-                    &scheduled_start_date_time,
+                    &schedule_at,
+                    &previous_scheduled_date,
                     &end_date,
                     week_days_for_repeat_every,
                 );
             } else {
                 return non_stop(
                     detail,
-                    &scheduled_start_date_time,
-                    schedule_start,
+                    &previous_scheduled_date,
+                    schedule_at,
                     &end_date,
                 );
             }
@@ -288,8 +215,8 @@ pub fn for_details(
         RepeatEvery::Month => {
             let result = non_stop(
                 detail,
-                &scheduled_start_date_time,
-                schedule_start,
+                &previous_scheduled_date,
+                schedule_at,
                 &end_date,
             );
             return result;
@@ -301,41 +228,41 @@ pub fn for_details(
 
 fn post_processing_output(
     detail: &ScheduleDetails,
-    schedule_start: &DateTime<Utc>,
-    scheduled_start_date_time: &DateTime<Utc>,
+    schedule_at: &DateTime<Utc>,
+    previous_scheduled_date: &DateTime<Utc>,
 ) -> DateTime<Utc> {
     match detail.repeat_every {
-        RepeatEvery::Day => concat_time(*schedule_start, *scheduled_start_date_time),
-        RepeatEvery::Week => concat_time(*schedule_start, *scheduled_start_date_time),
-        RepeatEvery::Month => set_date(detail, &schedule_start),
+        RepeatEvery::Day => concat_time(*schedule_at, *previous_scheduled_date),
+        RepeatEvery::Week => concat_time(*schedule_at, *previous_scheduled_date),
+        RepeatEvery::Month => set_date(detail, &schedule_at),
         RepeatEvery::Year => todo!(),
     }
 }
 
 fn non_stop(
     detail: &ScheduleDetails,
-    scheduled_start_date_time: &DateTime<Utc>,
-    _schedule_start: DateTime<Utc>,
+    previous_scheduled_date: &DateTime<Utc>,
+    _schedule_at: DateTime<Utc>,
     end_date: &DateTime<Utc>,
 ) -> Result<Vec<DateTime<Utc>>> {
     let mut result = Vec::new();
-    let mut schedule_start = _schedule_start;
+    let mut schedule_at = _schedule_at;
 
-    let diff = num_diff_i64(detail, &schedule_start, &end_date);
+    let diff = num_diff_i64(detail, &schedule_at, &end_date);
 
     for _ in 0..diff {
         result.push(
             // schedule_start
-            post_processing_output(detail, &schedule_start, scheduled_start_date_time),
+            post_processing_output(detail, &schedule_at, previous_scheduled_date),
         );
-        schedule_start = *get_schedule_start(detail, &schedule_start)?;
+        schedule_at = *get_schedule_start(detail, &schedule_at)?;
         
     }
 
     result.push(post_processing_output(
         detail,
-        &schedule_start,
-        scheduled_start_date_time,
+        &schedule_at,
+        previous_scheduled_date,
     ));
     Ok(result)
 }
@@ -343,31 +270,31 @@ fn non_stop(
 
 fn week_day_loop(
     detail: &ScheduleDetails,
-    _schedule_start: &DateTime<Utc>,
-    scheduled_start_date_time: &DateTime<Utc>,
+    _schedule_at: &DateTime<Utc>,
+    previous_scheduled_date: &DateTime<Utc>,
     end_date: &DateTime<Utc>,
     week_days_for_repeat_every: Vec<WeekDayForMonth>,
 ) -> Result<Vec<DateTime<Utc>>> {
     let mut result = Vec::new();
-    let mut schedule_start: DateTime<Utc> = *_schedule_start;
+    let mut schedule_at: DateTime<Utc> = *_schedule_at;
 
-    let diff = num_diff_i64(detail, &schedule_start, &end_date);
+    let diff = num_diff_i64(detail, &schedule_at, &end_date);
     for _ in 0..diff {        
         for week_day in 0..week_days_for_repeat_every.len() {
             let w = &week_days_for_repeat_every[week_day]
                 .to_chrono();
 
-            let u = get_week_bounded_days_for_given_date(&schedule_start);
+            let u = get_week_bounded_days_for_given_date(&schedule_at);
             let num = w.num_days_from_monday() as usize;
             result.push(
                 post_processing_output(
                     detail,
                     &u[num],
-                    scheduled_start_date_time,
+                    previous_scheduled_date,
                 )
             );
         }
-        schedule_start = *get_schedule_start(detail, &schedule_start)?;
+        schedule_at = *get_schedule_start(detail, &schedule_at)?;
     }
 
    return Ok(result);

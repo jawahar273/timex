@@ -138,16 +138,16 @@ pub fn _get_start_and_last_date_of_week_for_given_date(
 // nano second are not able to copy
 pub fn concat_time(
     scheduled_date_time: DateTime<Utc>,
-    original_scheduled_start_date_time: DateTime<Utc>,
+    previous_scheduled_date: DateTime<Utc>,
 ) -> DateTime<Utc> {
     let remp = Utc
         .with_ymd_and_hms(
             scheduled_date_time.year(),
             scheduled_date_time.month(),
             scheduled_date_time.day(),
-            original_scheduled_start_date_time.hour(),
-            original_scheduled_start_date_time.minute(),
-            original_scheduled_start_date_time.second(),
+            previous_scheduled_date.hour(),
+            previous_scheduled_date.minute(),
+            previous_scheduled_date.second(),
         )
         .unwrap()
         .with_timezone(&Utc);

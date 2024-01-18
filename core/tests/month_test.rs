@@ -1,11 +1,10 @@
 
 
-use crate::common::{
-    assert_diff_between_dates_with_repeated_time, 
-    get_start_end_date_month, num_of_diff_for_repeat_every as num_of_diff, get_start_end_date_year,
-};
-use anyhow::bail;
-use chrono::{Utc, DateTime, TimeZone, Datelike, Duration};
+use crate::common::
+    assert_diff_between_dates_with_repeated_time
+;
+
+use chrono::{Utc, DateTime, TimeZone, Datelike};
 use common::generate_happy_flow_arguments as common_para_for_test;
 use timex::model::ScheduleDetails;
 use timex::{schedule_date_times, for_month as unstable_for_month};
@@ -347,7 +346,7 @@ fn it_month_non_next_year() {
         Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
         Utc.with_ymd_and_hms(2027, 2, 20, 0, 0, 0).unwrap()
     );
-    let mut job_details = t.job_details;
+    let job_details = t.job_details;
     // let original_schedule = t.original_schedule;
     let scheduled_start_date_time = t.scheduled_start_date_time;
 
