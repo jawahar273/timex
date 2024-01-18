@@ -7,6 +7,7 @@ use timex::{
     unstable_get_start_and_last_of_year as get_start_and_last_of_year
 };
 
+#[allow(dead_code)]
 pub fn get_start_end_date_week() -> (DateTime<Utc>, DateTime<Utc>) {
     let bounded_weekdays = get_week_bounded_days_for_given_date(&Utc::now());
 
@@ -29,6 +30,7 @@ pub fn get_start_end_date_month() -> (DateTime<Utc>, DateTime<Utc>) {
     (a.0, e.1)
 }
 
+#[allow(dead_code)]
 pub fn get_start_end_date_year() -> (DateTime<Utc>, DateTime<Utc>) {
     let a = get_start_and_last_of_year(&Utc::now());
     let b = get_start_and_last_of_year(&(a.1 + Days::new(1)));
@@ -38,6 +40,7 @@ pub fn get_start_end_date_year() -> (DateTime<Utc>, DateTime<Utc>) {
     (a.0, d.1)
 }
 
+#[allow(dead_code)]
 pub fn num_of_diff_for_repeat_every(
     diff_duration: &Duration,
     repeat_every: &RepeatEvery,
@@ -59,6 +62,7 @@ pub fn num_of_diff_for_repeat_every(
     }
 }
 
+#[allow(dead_code)]
 pub fn assert_diff_between_dates_with_repeated_time(
     actual_dates: &Vec<DateTime<Utc>>,
     details: &ScheduleDetails,
@@ -99,7 +103,7 @@ pub fn add_repeat_time(
     original_schedule: &DateTime<Utc>,
     repeat: &RepeatEvery,
 ) -> DateTime<Utc> {
-    let r = (Utc::now() - original_schedule).abs();
+    let _r = (Utc::now() - original_schedule).abs();
     match repeat {
         RepeatEvery::Day => Utc::now() - Days::new(repeat_time.try_into().unwrap()),
         RepeatEvery::Week => Utc::now() - Duration::weeks((repeat_time) as i64),
