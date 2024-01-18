@@ -123,7 +123,7 @@ impl proto::ScheduleDetails {
 
         let repeat_every = RepeatEvery::from(pr.repeat_every);
         let end_option = EndOption::from(pr.end_option.expect("wrong option for end options"));
-        let week_days_for_repeat_every = Some(pr.week_days_for_repeat_every);
+        let week_days_for_repeat_every = Some(pr.week_days_for_repeat_every.iter().map(|x| WeekDayForMonth::from(x.to_string())).collect());
         let day_category_for_month = match pr.day_category_for_month {
             Some(v) => Some(DayCategoryFor::from(v)),
             None => None,
