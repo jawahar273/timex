@@ -109,7 +109,9 @@ fn get_schedule_start(
 
 
 /// Generate schedule date based on the given parameter
-/// [`ScheduleDetails`], 
+/// [`ScheduleDetails`].
+/// 
+/// FYI: naming this function yet to finalized.
 ///
 /// # Panics
 ///
