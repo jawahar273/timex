@@ -15,7 +15,7 @@ use chrono::{
 use log::info;
 
 
-
+#[deprecated(since = "0.2.0", note = "duplicate logic")]
 pub fn find_all_weekday_for_give_month(
     start: &DateTime<Utc>,
     week_day: &WeekDayForMonth,
@@ -48,6 +48,7 @@ pub fn find_all_weekday_for_give_month(
     result
 }
 
+#[deprecated(since = "0.2.0", note = "duplicate logic")]
 fn temp_result(
     sr: &Box<DateTime<Utc>>,
     end_date: DateTime<Utc>,
