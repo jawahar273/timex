@@ -30,7 +30,7 @@ export enum DayCategoryFor {
 }
 
 export type ScheduleDetails = {
-  scheduledStartDateTime: Date;
+  scheduledStartDateTime: Date | string;
   repeatEveryNumber: number;
   repeatEvery: RepeatEvery;
   endOption: EndOption;

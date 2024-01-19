@@ -6,7 +6,7 @@ import {
   FieldPath,
 } from "react-hook-form";
 
-import { EndOption, RepeatEvery, SetEventType, TimexEvent } from "@timex/types";
+import { EndOption, RepeatEvery, ScheduleDetails, SetEventType, TimexEvent } from "@timex/types";
 import {
   Form,
   FormControl,
@@ -41,14 +41,16 @@ import { string } from "zod";
 
 type DateProps = {
   setEvent: (details: SetEventType) => void;
+  onDropDownChange: (d: ScheduleDetails) => void;
 };
 
-function demoFill(data: TInputs) {
-  switch (data.type) {
+function demoFill(type: Types) {
+  let data = {}
+  switch (type) {
     default:
     case Types.EVERY_DAY: {
       data = {
-        ...data,
+
         repeatEveryNumber: 1,
         repeatEvery: "day" as RepeatEvery,
         endOption: "never" as EndOption,
@@ -57,7 +59,7 @@ function demoFill(data: TInputs) {
     }
     case Types.EVERY_WEEK: {
       data = {
-        ...data,
+
         repeatEveryNumber: 1,
         repeatEvery: "week" as RepeatEvery,
         endOption: "never" as EndOption,
@@ -67,7 +69,7 @@ function demoFill(data: TInputs) {
     }
     case Types.EVERY_MONTH: {
       return {
-        ...data,
+
         repeatEveryNumber: 1,
         repeatEvery: "month" as RepeatEvery,
         endOption: "never",
@@ -77,7 +79,7 @@ function demoFill(data: TInputs) {
     }
     case Types.EVERY_MONTH_2: {
       return {
-        ...data,
+
         repeatEveryNumber: 2,
         repeatEvery: "month" as RepeatEvery,
         endOption: "never",
@@ -87,7 +89,7 @@ function demoFill(data: TInputs) {
     }
     case Types.EVERY_MONTH_LAST_DAY : {
       return {
-        ...data,
+
 
         "repeatEveryNumber": 1,
         "repeatEvery": "month",
@@ -102,7 +104,7 @@ function demoFill(data: TInputs) {
     
     case Types.FOR_EVERY_MONTH_1ST_DAY: {
       return {
-        ...data,
+
         "repeatEveryNumber": 1,
         "repeatEvery": "month",
         "endOption": "never",
@@ -113,7 +115,7 @@ function demoFill(data: TInputs) {
   }
 }
 
-export function DateJsx(props: DateProps) {
+export function DateJsx({setEvent, onDropDownChange}: DateProps) {
   
   const [loading, setLoading] = useState(false);
   const [errorObj, setHasError] = useState<Error>();
@@ -124,22 +126,30 @@ export function DateJsx(props: DateProps) {
       repeatEveryType: RepeatEvery.Day,
     },
   });
-
-  const onSubmit: SubmitHandler<TInputs> = async (data) => {
-    // data.scheduledStartDateTime = typeof data.scheduledStartDateTime === 'date' ? data.scheduledStartDateTime.toISOString() : data.scheduledStartDateTime;
-    setLoading(true);
-    const temp = demoFill(data);
+  
+  const preProcess = (data: TInputs): TInputs => {
+    const temp = {
+      ...data,
+      ...demoFill(data.type),
+    };
     temp.scheduledStartDateTime = dayjs(temp.scheduledStartDateTime)
       .second(59)
       .minute(59)
       .hour(11)
       .toDate();
+    return temp;
+  }
+  const onSubmit: SubmitHandler<TInputs> = async (data) => {
+    // data.scheduledStartDateTime = typeof data.scheduledStartDateTime === 'date' ? data.scheduledStartDateTime.toISOString() : data.scheduledStartDateTime;
+    setLoading(true);
+    const temp = preProcess(data)
+
 const API_DOMAIN = 'https://timex.up.railway.app/';
 try {
   const res = await axios.post<TimexEvent>(
     new URL ( "/api/v1/schedule/", API_DOMAIN).href,
     {
-      details: demoFill(data),
+      details: temp,
       previousScheduleDate: dayjs(
         dayjs(temp.scheduledStartDateTime)
           .subtract(1, "day")
@@ -160,7 +170,7 @@ try {
       },
     }
   );
-  props.setEvent({ events: res.data });
+  setEvent({ events: res.data });
   console.log(res);
 } catch (error) {
   setHasError(error as any)
@@ -217,7 +227,7 @@ try {
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value}
+                    selected={field.value as Date}
                     onSelect={field.onChange}
                     defaultMonth={dayjs().toDate()}
                     // disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
@@ -279,7 +289,27 @@ try {
             </FormItem>
           )}
         /> */}
+        <span className="space-x-1">
+        <Button type="button"
+        variant="outline"
+        onClick={async () => {
+          try {
+            const status = await form.trigger()
+            const temp = preProcess(form.getValues());
+            if (status) {  
+              temp.scheduledStartDateTime = dayjs(temp.scheduledStartDateTime).toISOString()            
+              onDropDownChange(
+                temp,
+              )
+            }
+          } catch (error) {
+            console.error("validation failed", error)
+          }
+
+        }}
+        >Check</Button>
         <Button type="submit" disabled={loading}>Submit</Button>
+        </span>
       </form>
     </Form>
     </div>

@@ -23,37 +23,25 @@ import { string } from "zod";
 import axios from "axios";
 import { Highlighter, HighlighterLang } from "../highlight";
 
-// import timexW, {
-//   showDetailInDisplay,
-//   initSync,
-//   SyncInitInput,
-// } from "../../pkg/timex";
+import init, {
+  showDetailInDisplay,
+} from "../../../public/pkg";
+import { useToast } from "@timex/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
-// async function Temp() {
-//   const wasm = await timexW("../../pkg/timex");
-
-//   const details = {
-//     scheduledStartDateTime: "2023-12-10T09:08:44.939Z",
-//     repeatEveryNumber: 1,
-//     repeatEvery: "week",
-//     endOption: "never",
-//     weekDaysForRepeatEvery: [],
-//   };
-
-//   let temp = {};
-//   Object.keys(details).forEach((k) => {
-//     const newK = k.replace(/(\_\w)/g, (m) => m[1].toUpperCase());
-//     temp[newK as keyof typeof string] = temp[k as keyof typeof string];
-//     delete details[k as keyof typeof string];
-//   });
-
-//   console.log(wasm.showDetailInDisplay(temp as any));
-// }
+async function Temp() {
+  await init();
+}
 
 export default function Home() {
   const [dateTime, setDateTime] = useState<Record<string, Event[]>>();
   const [orignal, setOrignal] = useState<string>("");
-
+  const { toast } = useToast()
+  
+  useEffect(() => {
+    Temp()
+  }, [])
+  
   const setEvent = ({ events }: SetEventType) => {
     setOrignal(JSON.stringify(events.scheduledDateTime || [], null, 3));
     console.log('===>', JSON.stringify(events.scheduledDateTime || [], null, 3))
@@ -86,7 +74,13 @@ export default function Home() {
         <CardContent>
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel defaultSize={25}>
-              <DateJsx setEvent={setEvent} />
+              <DateJsx onDropDownChange={(event) => {
+                toast({
+                  title: showDetailInDisplay(event) ,
+                  description: 'Selected options',
+                })
+              }} setEvent={setEvent} />
+
               {/* 
               <div className="flex flex-col">
                 <Dialog>

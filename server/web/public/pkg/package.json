@@ -1,0 +1,14 @@
+{
+  "name": "timex",
+  "version": "0.1.0-rc.0",
+  "files": [
+    "timex_bg.wasm",
+    "timex.js",
+    "timex.d.ts"
+  ],
+  "module": "timex.js",
+  "types": "timex.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

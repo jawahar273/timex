@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { Inter as FontSans } from "next/font/google";
+import { Toaster } from '@timex/components/ui/toaster'
 
 import { cn } from "@timex/utils";
 
@@ -24,11 +25,14 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased"
+          "min-h-screen bg-background font-sans antialiased bg-neutral-100"
           // fontSans.variable
         )}
       >
+        <main className="">
         {children}
+        </main>
+        <Toaster />
       </body>
     </html>
   );
