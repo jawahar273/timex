@@ -1,3 +1,4 @@
+CORE_PATH="./core"
 
 install:
 	echo "demo required, rust(https://github.com/rust-lang/rust), golang(https://github.com/golang/go) and nvm(https://github.com/nvm-sh/nvm)";
@@ -6,7 +7,7 @@ install:
 	echo "install golang"
 	cd ./server/ && go mod tidy
 	echo "install web"
-	cd ./server/web && nvm use && npm install
+	cd ./server/web  && npm install
 
 	
 r.app:
@@ -20,3 +21,7 @@ g.app:
 web:
 	cd ./server/web &&\
 	npm run dev
+
+# TODO: on git push make sure run this command
+readme:
+	cp ./README.md ${CORE_PATH}

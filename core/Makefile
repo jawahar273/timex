@@ -17,4 +17,5 @@ docs:
 init-dep:
 	cargo install cargo-audit
 	cargo install cargo-tarpaulin 
+	cargo install cargo-release
 	# cargo install flamegraph
