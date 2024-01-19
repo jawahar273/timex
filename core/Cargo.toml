@@ -1,9 +1,17 @@
 [package]
 name = "timex"
-version = "0.1.0-rc.0"
+version = "0.1.0-rc.1"
 edition = "2021"
 resolver = "2"
-
+authors = ["Jawahar S <jawahar273@gmail.com>"]
+license = "MIT"
+description = "Generate date times as event similar to Microsoft calender or Google calender based on the given parameters."
+readme = "README.md"
+homepage = "https://github.com/jawahar273/timex"
+repository = "https://github.com/jawahar273/timex"
+categories = ["date-and-time"]
+keywords = ["date and time", "date"]
+rust-version = "1.73"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
