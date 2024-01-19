@@ -36,15 +36,18 @@ timex = "0.0.1"
 
 ```rust
 
+
 use timex::{
     schedule_date_times,
     model::ScheduleDetails
 };
 use chrono::{DateTime, Utc};
+use serde_json;
+
 
 fn main() {
     
-    /// Start: Mock for schedule details
+    // Start: Mock for schedule details
     let t = r#"
     {
         "scheduledStartDateTime": "2023-12-14T08:00:44.939Z",
@@ -54,7 +57,7 @@ fn main() {
     }
     "#;
     let job_details: ScheduleDetails = serde_json::from_str(&t).unwrap();
-    /// END: Mock for schedule details
+    // END: Mock for schedule details
     
     
     let previous_scheduled_date = DateTime::parse_from_rfc3339("2024-01-03T00:00:00Z")
@@ -73,13 +76,13 @@ fn main() {
         end_range,
     );
     println!("{:?}",&result.unwrap());
-    // &result = [
-    //     2024-01-05T08:28:46Z,
-    //     2024-01-06T08:28:46Z,
+    // [
+    // 2024-01-04T00:00:00Z,
+    // 2024-01-05T00:00:00Z,
+    // 2024-01-06T00:00:00Z,
+    // 2024-01-07T00:00:00Z
     // ]
 }
-
-
 ```
 
 ## License
