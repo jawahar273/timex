@@ -41,7 +41,7 @@ fn it_more_than_31_days() {
 }
 
 #[test]
-fn it_scheduled_date_time_lie_out_of_start_and_end_range_date() {
+fn it_scheduled_date_time_lie_out_of_start_and_end_range_date_past() {
     let sc = r#"
    {
       "scheduledStartDateTime": "2023-12-14T08:00:44.939Z",
@@ -59,6 +59,45 @@ fn it_scheduled_date_time_lie_out_of_start_and_end_range_date() {
 let range_date = t.range_date;
 let job_details = t.job_details;
 // let original_schedule = t.original_schedule;
+
+    let actual = schedule_date_times(
+        &job_details,
+        range_date.1 + Duration::days(10),
+        range_date.0,
+        range_date.1,
+    )
+    .unwrap();
+
+    dbg!(&actual);
+    assert_eq!(
+        actual.len(),
+        0,
+        "previous schedule date range should lies out side of start and end date range",
+    )
+
+}
+
+
+
+#[test]
+fn it_scheduled_date_time_lie_out_of_start_and_end_range_date_future() {
+    let sc = r#"
+   {
+      "scheduledStartDateTime": "2023-12-14T08:00:44.939Z",
+      "repeatEveryNumber": 1,
+      "repeatEvery": "day",
+      "endOption": "never"
+    }
+   "#;
+
+   
+   let t = generate_happy_flow_arguments(
+    sc,
+);
+
+let range_date = t.range_date;
+let mut job_details = t.job_details;
+job_details.scheduled_start_date_time = (range_date.1 + Duration::days(1)).to_rfc3339();
 
     let actual = schedule_date_times(
         &job_details,
