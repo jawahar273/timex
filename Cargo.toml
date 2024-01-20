@@ -1,6 +1,6 @@
 [package]
 name = "timex"
-version = "0.1.0-rc.1"
+version = "0.1.0-beta"
 edition = "2021"
 resolver = "2"
 authors = ["Jawahar S <jawahar273@gmail.com>"]
@@ -10,8 +10,9 @@ readme = "README.md"
 homepage = "https://github.com/jawahar273/timex"
 repository = "https://github.com/jawahar273/timex"
 categories = ["date-and-time"]
-keywords = ["date and time", "date"]
+keywords = ["calendar", "date", "time"]
 rust-version = "1.73"
+exclude = ["server", "coverage"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]

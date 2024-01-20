@@ -1,27 +1,22 @@
-CORE_PATH="./core"
+.PHONY: coverage
+coverage:
+	cargo tarpaulin --out html \
+		--output-dir ./coverage/dev \
+		# --engine llvm \
+		--count 
 
-install:
-	echo "demo required, rust(https://github.com/rust-lang/rust), golang(https://github.com/golang/go) and nvm(https://github.com/nvm-sh/nvm)";
-	echo "install rust"
-	cd ./server/ && cargo build
-	echo "install golang"
-	cd ./server/ && go mod tidy
-	echo "install web"
-	cd ./server/web  && npm install
+add-wasm:
+	rustup target add wasm32-wasi 
 
-	
-r.app:
-	cd ./server/ &&\
-	cargo run
+wasm:
+	cargo build --target wasm32-wasi
 
-g.app:
-	cd ./server/ &&\
-	go run main.go
+docs:
+	cargo doc --open --no-deps
 
-web:
-	cd ./server/web &&\
-	npm run dev
-
-# TODO: on git push make sure run this command
-readme:
-	cp ./README.md ${CORE_PATH}
+init-dep:
+	cargo install cargo-audit \
+		cargo-tarpaulin \
+		cargo-release \
+		git-cliff
+	# cargo install flamegraph

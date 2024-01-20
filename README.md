@@ -88,3 +88,7 @@ fn main() {
 ## License
 
 This project is licensed under the MIT License.
+
+## About this project
+
+This project will follow the conversion of [semver](https://semver.org) versions and for the commit [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) to track change log.
