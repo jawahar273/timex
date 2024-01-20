@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.2-beta.1] - 2024-01-20
+## [0.1.3-beta.1] - 2024-01-20
 
 ### Miscellaneous Tasks
 
+- Added pre-release commend in Makefile to make quick pre-release stages
+- Release timex version 0.1.2-beta.1
 - Add release config with pre hook for changelog version
 - Release timex version 0.1.0-beta.1
 - Spling of year cut the date and special case on end date of month
