@@ -2,11 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.1.2-beta.1] - 2024-01-20
 
 ### Miscellaneous Tasks
 
-- Introducing git cliff tool for changelog
+- Add release config with pre hook for changelog version
+- Release timex version 0.1.0-beta.1
 - Spling of year cut the date and special case on end date of month
 
 ### ✨ Refactor

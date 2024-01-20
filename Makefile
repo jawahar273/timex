@@ -23,9 +23,9 @@ init-dep:
 	# cargo install flamegraph
 
 pre-release:
-	ifeq ($(version),)
-	 git cliff -o CHANGELOG.md --tag $(version)
-	 cargo release version $(version) --execute --no-confirm
-	 cargo release commit --execute --no-confirm
-	endif
+	@test $${version?Please set the version for release}
+	git cliff -o CHANGELOG.md --tag $(version)
+	cargo release version $(version) --execute --no-confirm
+	cargo release commit --execute --no-confirm
+
 	 
