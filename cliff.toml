@@ -82,5 +82,3 @@ topo_order = false
 sort_commits = "newest"
 # limit the number of commits included in the changelog.
 # limit_commits = 42
-
-pre-release-hook = ["git", "cliff", "-o", "CHANGELOG.md", "--tag", "{{version}}" ]
