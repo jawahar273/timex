@@ -1,4 +1,5 @@
-.PHONY: coverage
+.PHONY: coverage release wasm init pre-release
+
 coverage:
 	cargo tarpaulin --out html \
 		--output-dir ./coverage/dev \
@@ -20,3 +21,11 @@ init-dep:
 		cargo-release \
 		git-cliff
 	# cargo install flamegraph
+
+pre-release:
+	ifeq ($(version),)
+	 git cliff -o CHANGELOG.md --tag $(version)
+	 cargo release version $(version) --execute --no-confirm
+	 cargo release commit --execute --no-confirm
+	endif
+	 
