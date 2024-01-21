@@ -2,10 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3-beta.1] - 2024-01-21
+
+### ✨ Refactor
+
+- Make stable api from `unstable_get_week_bounded_days_for_given_date` to `get_week_bounded_days_for_given_date`
+
 ## [0.1.3-beta.1] - 2024-01-20
 
 ### Miscellaneous Tasks
 
+- Release timex version 0.1.3-beta.1
 - Added pre-release commend in Makefile to make quick pre-release stages
 - Release timex version 0.1.2-beta.1
 - Add release config with pre hook for changelog version
