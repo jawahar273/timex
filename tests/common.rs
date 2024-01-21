@@ -3,13 +3,13 @@ use timex::{
     date_diff,
     model::{RepeatEvery, ScheduleDetails},
     unstable_get_start_and_last_date_of_month_for_given_date as get_start_and_last_date_of_month_for_given_date,
-    unstable_get_week_bounded_days_for_given_date as get_week_bounded_days_for_given_date,
+    get_week_bounded_days_for_given_date,
     unstable_get_start_and_last_of_year as get_start_and_last_of_year
 };
 
 #[allow(dead_code)]
 pub fn get_start_end_date_week() -> (DateTime<Utc>, DateTime<Utc>) {
-    let bounded_weekdays = get_week_bounded_days_for_given_date(&Utc::now());
+    let bounded_weekdays = get_week_bounded_days_for_given_date(&Utc::now()).unwrap();
 
     let start_range_date = bounded_weekdays[0];
     let end_range_date = bounded_weekdays[6];

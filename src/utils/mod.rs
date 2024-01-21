@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use anyhow::{Ok, Result};
 use chrono::{DateTime, Datelike, Days, NaiveDate, TimeZone, Timelike, Utc, Weekday};
 
 mod diff;
@@ -99,20 +100,20 @@ pub fn get_start_and_last_date_of_month_for_given_date(
 }
 
 // Date are generated and return as  vector starting from Monday to Sunday
-pub fn get_week_bounded_days_for_given_date(date: &DateTime<Utc>) -> Vec<DateTime<Utc>> {
+pub fn get_week_bounded_days_for_given_date(date: &DateTime<Utc>) -> Result<Vec<DateTime<Utc>>> {
     let year = date.year();
     let week_number = date.iso_week().week();
     let mut result: Vec<DateTime<Utc>> = vec![];
 
     for inx in 0..7 {
-        let o = NaiveDate::from_isoywd_opt(year, week_number, Weekday::try_from(inx).unwrap())
-            .unwrap()
+        let o = NaiveDate::from_isoywd_opt(year, week_number, Weekday::try_from(inx)?)
+            .expect("failed get date from week number")
             .and_hms_nano_opt(0, 0, 0, 0)
-            .unwrap()
+            .expect("failed to reset time value in date")
             .and_utc();
         result.push(o)
     }
-    result
+    Ok(result)
 }
 
 pub fn _get_start_and_last_date_of_week_for_given_date(
@@ -191,7 +192,7 @@ mod test {
         let input_date = DateTime::parse_from_rfc3339("2023-12-17T00:00:00Z")
             .unwrap()
             .with_timezone(&Utc);
-        let actual = get_week_bounded_days_for_given_date(&input_date);
+        let actual = get_week_bounded_days_for_given_date(&input_date).unwrap();
 
         let monday_expect_date: DateTime<Utc> =
             DateTime::parse_from_rfc3339("2023-12-11T00:00:00Z")

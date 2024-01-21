@@ -144,7 +144,7 @@ pub fn for_week(
         let w = &week_days_for_repeat_every[week_day]
             .to_chrono();
 
-        let u = get_week_bounded_days_for_given_date(&schedule_start);
+        let u = get_week_bounded_days_for_given_date(&schedule_start).unwrap();
         let num = w.num_days_from_monday() as usize;
         result.push(u[num]);
     }

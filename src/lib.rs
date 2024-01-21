@@ -17,7 +17,7 @@ pub use self::utils::{
     date_diff,
     get_start_and_last_date_of_month_for_given_date as unstable_get_start_and_last_date_of_month_for_given_date,
     get_start_and_last_of_year as unstable_get_start_and_last_of_year,
-    get_week_bounded_days_for_given_date as unstable_get_week_bounded_days_for_given_date,
+    get_week_bounded_days_for_given_date,
 };
 
 pub use self::days::for_days;

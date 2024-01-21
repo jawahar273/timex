@@ -7,4 +7,6 @@ pub enum ScheduleError {
     DaysWithMoreThan31AreNotAllowed(),
     #[error("Unexpected error from Scheduler")]
     Unknown(),
+    #[error("Conversion Error: {0}")]
+    DateConversionError(String),
 }

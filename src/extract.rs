@@ -180,7 +180,7 @@ pub fn for_details(
 
     match detail.repeat_every {
         RepeatEvery::Day => {
-            let result = non_stop(
+            let result = calculate_date_difference(
                 detail,
                 &previous_scheduled_date,
                 schedule_at,
@@ -198,7 +198,7 @@ pub fn for_details(
         
             if week_days_for_repeat_every.len() >= 1 {
 
-                return week_day_loop(
+                return calculate_date_difference_for_week_day(
                     detail,
                     &schedule_at,
                     &previous_scheduled_date,
@@ -206,7 +206,7 @@ pub fn for_details(
                     week_days_for_repeat_every,
                 );
             } else {
-                return non_stop(
+                return calculate_date_difference(
                     detail,
                     &previous_scheduled_date,
                     schedule_at,
@@ -215,7 +215,7 @@ pub fn for_details(
             }
         }
         RepeatEvery::Month => {
-            let result = non_stop(
+            let result = calculate_date_difference(
                 detail,
                 &previous_scheduled_date,
                 schedule_at,
@@ -241,7 +241,7 @@ fn post_processing_output(
     }
 }
 
-fn non_stop(
+fn calculate_date_difference(
     detail: &ScheduleDetails,
     previous_scheduled_date: &DateTime<Utc>,
     _schedule_at: DateTime<Utc>,
@@ -270,7 +270,7 @@ fn non_stop(
 }
 
 
-fn week_day_loop(
+fn calculate_date_difference_for_week_day(
     detail: &ScheduleDetails,
     _schedule_at: &DateTime<Utc>,
     previous_scheduled_date: &DateTime<Utc>,
@@ -286,7 +286,7 @@ fn week_day_loop(
             let w = &week_days_for_repeat_every[week_day]
                 .to_chrono();
 
-            let u = get_week_bounded_days_for_given_date(&schedule_at);
+            let u = get_week_bounded_days_for_given_date(&schedule_at)?;
             let num = w.num_days_from_monday() as usize;
             result.push(
                 post_processing_output(
