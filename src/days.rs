@@ -36,6 +36,7 @@ pub fn for_days(
                 end_range_date
             }
         }
+
         model::EndOption::OnThe => {
             let t = DateTime::parse_from_rfc3339(
                 // detail.end_date.as_ref().unwrap().as_str()
@@ -44,6 +45,7 @@ pub fn for_days(
             .with_timezone(&Utc);
             t
         }
+
         model::EndOption::Never => {
             // let t = offset::Utc::now().checked_add_days(Days::new(range_of_days)).unwrap();
             // t

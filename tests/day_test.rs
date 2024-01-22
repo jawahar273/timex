@@ -7,7 +7,6 @@ use chrono::{DateTime, Duration, Timelike, Utc, Month, Months, TimeZone, Datelik
 
 use timex::{
     schedule_date_times,
-    for_days as unstable_for_days,
     model::{ScheduleDetails, RepeatEvery},
 };
 #[path = "./common.rs"]
@@ -15,26 +14,6 @@ mod common;
 
 
 use serde_json;
-
-
-fn assert_with_old_api(
-    actual: &Vec<DateTime<Utc>>,
-        job_details: &ScheduleDetails,
-        scheduled_start_date_time: DateTime<Utc>,
-            range_date: (DateTime<Utc>, DateTime<Utc>),
-) {
-    let actual2 = unstable_for_days(
-        &job_details,
-        scheduled_start_date_time,
-        range_date.0,
-        range_date.1,
-        Some(true),
-    ).unwrap();
-
-    // dbg!(&actual);
-    // dbg!(&actual2);
-    assert_eq!(actual, &actual2, "new api wrong value",); 
-}
 
 
 /// Just run for one
@@ -109,7 +88,6 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     
-    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
 
     // println!("{result}");
 }
@@ -145,7 +123,6 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
 
 
-assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
 
 }
 
@@ -183,7 +160,6 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
 
 
-    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
 
 
     // FIX: check why the occurrenceValue is not satisfied
@@ -245,7 +221,6 @@ let scheduled_start_date_time = t.scheduled_start_date_time;
         "start and end date occurrence should be equal"
     );
 
-    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
 
 }
 

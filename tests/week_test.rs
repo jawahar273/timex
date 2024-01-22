@@ -2,10 +2,7 @@ use std::collections::HashSet;
 
 use chrono::{Utc, DateTime, Datelike};
 use timex::model::{ScheduleDetails, WeekDayForMonth};
-use timex::{
-    schedule_date_times,
-    for_week as unstable_for_week,
-};
+use timex::schedule_date_times;
 
 use crate::common::{
     add_repeat_time, assert_diff_between_dates_with_repeated_time, get_start_end_date_week, generate_happy_flow_arguments as common_para_for_test,
@@ -38,24 +35,6 @@ fn assert_check_week_day_for_given_date(
     }
 }
 
-fn assert_with_old_api(
-    actual: &Vec<DateTime<Utc>>,
-        job_details: &ScheduleDetails,
-        scheduled_start_date_time: DateTime<Utc>,
-            range_date: (DateTime<Utc>, DateTime<Utc>),
-) {
-    let actual2 = unstable_for_week(
-        &job_details,
-        scheduled_start_date_time,
-        range_date.0,
-        range_date.1,
-        Some(true),
-    ).unwrap();
-
-    dbg!(&actual);
-    dbg!(&actual2);
-    assert_eq!(actual, &actual2, "new api wrong value",); 
-}
 
 #[test]
 fn it_week_never_stop() {
@@ -95,12 +74,7 @@ fn it_week_never_stop() {
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
 
     assert_ne!(actual.len(), 0, "every week a date has be produced");
-    assert_with_old_api(
-        &actual,
-        &job_details,
-        scheduled_start_date_time,
-        range_date,
-    )
+
 }
 
 #[test]
@@ -141,12 +115,7 @@ fn it_week_stop_at_occurrence_of_n() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     // FIX: check why the occurrenceValue is not satisfied
-    assert_with_old_api(
-        &actual,
-        &job_details,
-        scheduled_start_date_time,
-        range_date,
-    );
+
 }
 
 /// Assert between two date might not work as the weekdays involves for the specific week

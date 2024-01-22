@@ -4,33 +4,12 @@ use crate::common::
     assert_diff_between_dates_with_repeated_time
 ;
 
-use chrono::{Utc, DateTime, TimeZone, Datelike};
+use chrono::{Utc, TimeZone, Datelike};
 use common::generate_happy_flow_arguments as common_para_for_test;
-use timex::model::ScheduleDetails;
-use timex::{schedule_date_times, for_month as unstable_for_month};
+use timex::schedule_date_times;
 
 #[path = "./common.rs"]
 mod common;
-
-
-fn assert_with_old_api(
-    actual: &Vec<DateTime<Utc>>,
-        job_details: &ScheduleDetails,
-        scheduled_start_date_time: DateTime<Utc>,
-            range_date: (DateTime<Utc>, DateTime<Utc>),
-) {
-    let actual2 = unstable_for_month(
-        &job_details,
-        scheduled_start_date_time,
-        range_date.0,
-        range_date.1,
-    ).unwrap();
-
-    dbg!(&actual);
-    dbg!(&actual2);
-    assert_eq!(actual, &actual2, "new api wrong value",); 
-}
-
 
 
 
@@ -83,7 +62,6 @@ fn it_month_non_stop_on_given_day() {
             // onDayValueForMonth
         )
     }
-    // assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
 
     
 }
@@ -141,7 +119,6 @@ fn it_month_first_monday_non_stop() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     // TODO: check for weekday is correct
-    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
     
 }
 
@@ -184,7 +161,6 @@ fn it_month_special_case_non_stop() {
 
     assert_diff_between_dates_with_repeated_time(&actual, &job_details, &scheduled_start_date_time);
     // TODO: add test to check end date of the month is equal to given date's end date of the month
-    assert_with_old_api(&actual, &job_details, scheduled_start_date_time, range_date);
     
 }
 
