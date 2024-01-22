@@ -2,7 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0-beta.1] - 2024-01-22
+
+### Miscellaneous Tasks
+
+- Removed cargo release commit and tag
+- Removed deprecated api
+- Added one more option on `security` group on git cliff configuration
+- Enabled code scan with codeql.yml
+
+### 🦺 Security
+
+- Added cargo audit cron job using github action
+
 ## [0.2.3-beta.1] - 2024-01-21
+
+### Miscellaneous Tasks
+
+- Release timex version 0.2.3-beta.1
 
 ### ✨ Refactor
 
