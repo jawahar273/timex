@@ -26,6 +26,5 @@ pre-release:
 	@test $${version?Please set the version for release}
 	git cliff -o CHANGELOG.md --tag $(version)
 	cargo release version $(version) --execute --no-confirm
-	cargo release commit --execute --no-confirm
-	cargo release tag --execute --no-confirm
+
 	 
