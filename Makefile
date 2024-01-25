@@ -4,10 +4,10 @@ coverage:
 	cargo tarpaulin --out html \
 		--output-dir ./coverage/dev \
 		# --engine llvm \
-		--count 
+		--count
 
 add-wasm:
-	rustup target add wasm32-wasi 
+	rustup target add wasm32-wasi
 
 wasm:
 	cargo build --target wasm32-wasi
@@ -26,6 +26,7 @@ pre-release:
 	@test $${version?Please set the version for release}
 	git cliff -o CHANGELOG.md --tag $(version)
 	cargo release version $(version) --execute --no-confirm
-	# cargo release commit --execute --no-confirm
-	# cargo release tag --execute --no-confirm
-	 
+
+relase:
+	cargo release commit --execute
+	cargo release tag --execute --no-confirm
