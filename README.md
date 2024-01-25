@@ -24,7 +24,7 @@ timex = "0.0.1"
 
 - Time range
 - Occurrence
-- Based on daily, weekly, monthly(WIP: end date) and yearly(soon)..
+- Based on daily, weekly, monthly and yearly(soon)..
 - Web assembly support(Soon)
 
 ## Limitation
@@ -46,7 +46,7 @@ use serde_json;
 
 
 fn main() {
-    
+
     // Start: Mock for schedule details
     let t = r#"
     {
@@ -58,8 +58,8 @@ fn main() {
     "#;
     let job_details: ScheduleDetails = serde_json::from_str(&t).unwrap();
     // END: Mock for schedule details
-    
-    
+
+
     let previous_scheduled_date = DateTime::parse_from_rfc3339("2024-01-03T00:00:00Z")
                         .unwrap()
                         .with_timezone(&Utc);
