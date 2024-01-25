@@ -2,10 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2-beta.1] - 2024-01-25
+
+### Miscellaneous Tasks
+
+- Update makefile command for release
+
+### 📝 Documentation
+
+- Fix typo
+
 ## [0.3.0-beta.1] - 2024-01-22
 
 ### Miscellaneous Tasks
 
+- Release timex version 0.3.0-beta.1
+- Removed commit cargo release and tag in 'pre-release'
 - Removed cargo release commit and tag
 - Removed deprecated api
 - Added one more option on `security` group on git cliff configuration
@@ -31,6 +43,11 @@ All notable changes to this project will be documented in this file.
 
 - Release timex version 0.1.3-beta.1
 - Added pre-release commend in Makefile to make quick pre-release stages
+
+## [0.1.2-beta.1] - 2024-01-20
+
+### Miscellaneous Tasks
+
 - Release timex version 0.1.2-beta.1
 - Add release config with pre hook for changelog version
 - Release timex version 0.1.0-beta.1

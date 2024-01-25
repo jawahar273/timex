@@ -1,6 +1,6 @@
 [package]
 name = "timex"
-version = "0.3.0-beta.1"
+version = "0.3.2-beta.1"
 edition = "2021"
 resolver = "2"
 authors = ["Jawahar S <jawahar273@gmail.com>"]
