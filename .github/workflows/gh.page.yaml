@@ -58,17 +58,6 @@ jobs:
         runs-on: ubuntu-latest
         needs: build
         steps:
-        - name: Deploy to Netlify
-          uses: nwtgck/actions-netlify@v2.0
-          with:
-            publish-dir: './out'
-            production-branch: web-asm
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            deploy-message: "Deploy from GitHub Actions"
-            enable-pull-request-comment: false
-            enable-commit-comment: true
-            overwrites-pull-request-comment: true
-          env:
-            NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-            NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          timeout-minutes: 1
+        - name: Deploy to GitHub Pages
+          id: deployment
+          uses: actions/deploy-pages@v4
