@@ -15,20 +15,16 @@ jobs:
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                node-version: "20"
-                cache: npm
             - name: Change folder location
               id: web-folder
               run: |
                  echo "path=./server/web" >> $GITHUB_OUTPUT
                  exit 0
-            - name: Install npm
-              run: cd ${{ steps.web-folder.outputs.path }} && npm install
-            - name: build website
-              run: cd ${{ steps.web-folder.outputs.path }} && npm run build
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: "20"
+                cache: cd {{ steps.web-folder.outputs.path }} && npm
             - name: Deploy
               uses: peaceiris/actions-gh-pages@v3
               if: github.ref == 'refs/heads/main'
