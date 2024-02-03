@@ -1,10 +1,11 @@
+workspace = { members = ["asm"] }
 [package]
 name = "timex"
 version = "0.3.2-beta.1"
 edition = "2021"
 resolver = "2"
 authors = ["Jawahar S <jawahar273@gmail.com>"]
-license = "MIT"
+license = "mit"
 description = "Generate date times as event similar to Microsoft calender or Google calender based on the given parameters."
 readme = "README.md"
 homepage = "https://github.com/jawahar273/timex"
@@ -25,8 +26,6 @@ env_logger = "0.10.1"
 log = "0.4.20"
 serde = { version = "1.0.193", features = ["derive"] }
 thiserror = "1.0.50"
-wasm-bindgen = "0.2.89"
-serde-wasm-bindgen = "0.6.3"
 serde_json = "1.0.108"
 
 # reduce web assembly size https://rustwasm.github.io/twiggy/

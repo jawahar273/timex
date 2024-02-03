@@ -1,0 +1,14 @@
+{
+  "name": "asm",
+  "version": "0.1.0",
+  "files": [
+    "asm-9dbf0d2_bg.wasm",
+    "asm-9dbf0d2.js",
+    "asm-9dbf0d2.d.ts"
+  ],
+  "module": "asm-9dbf0d2.js",
+  "types": "asm-9dbf0d2.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

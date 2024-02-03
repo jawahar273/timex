@@ -24,8 +24,8 @@ import axios from "axios";
 import { Highlighter, HighlighterLang } from "../highlight";
 
 import init, {
-  showDetailInDisplay,
-} from "../../../public/pkg";
+  show_detail_in_display as showDetailInDisplay,
+} from "asm";
 import { useToast } from "@timex/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 

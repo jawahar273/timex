@@ -1,4 +1,7 @@
-CORE_PATH="./core"
+CORE_PATH="."
+ASM_PATH="../asm"
+WEB_PATH="./server/web"
+
 
 
 install:
@@ -32,10 +35,10 @@ go-grpc:
 		--proto_path=. \
 		./proto/api/v1/*.proto
 
-# asm:
-# rm -rf ./web/pkg
-# cd ${CORE_PATH} && \
-# wasm-pack build --target web && \
-# cd .. && \
-# mv ${CORE_PATH}/pkg ./server/web/
-	
+
+asm:
+	cd .. && \
+	 cd asm && \
+	 CARGO_TARGET_DIR=./ cargo build --target wasm32-wasi --release && \
+	 cd .. && \
+	 cp ./asm/wasm32-wasi/release/asm.wasm ./server/

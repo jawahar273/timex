@@ -384,9 +384,9 @@ checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 
 [[package]]
 name = "h2"
-version = "0.3.24"
+version = "0.3.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb2c4422095b67ee78da96fbb51a4cc413b3b25883c7717ff7ca1ab31022c9c9"
+checksum = "4d6250322ef6e60f93f9a2162799302cd6f68f79f6e5d85c8c16f14d1d958178"
 dependencies = [
  "bytes",
  "fnv",
@@ -537,7 +537,7 @@ dependencies = [
  "futures-channel",
  "futures-core",
  "futures-util",
- "h2 0.3.24",
+ "h2 0.3.22",
  "http 0.2.11",
  "http-body 0.4.6",
  "httparse",
@@ -1224,7 +1224,7 @@ dependencies = [
 
 [[package]]
 name = "timex"
-version = "0.3.2-beta.1"
+version = "0.3.0-beta.1"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1313,7 +1313,7 @@ dependencies = [
  "axum 0.6.20",
  "base64",
  "bytes",
- "h2 0.3.24",
+ "h2 0.3.22",
  "http 0.2.11",
  "http-body 0.4.6",
  "hyper 0.14.28",

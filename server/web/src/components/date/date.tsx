@@ -39,6 +39,8 @@ import _ from "lodash";
 import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
 import { string } from "zod";
 
+import { find_schedule_date_time as findScheduleDateTime } from "asm"
+
 type DateProps = {
   setEvent: (details: SetEventType) => void;
   onDropDownChange: (d: ScheduleDetails) => void;
@@ -139,7 +141,48 @@ export function DateJsx({setEvent, onDropDownChange}: DateProps) {
       .toDate();
     return temp;
   }
+
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
+  try {
+        const temp = preProcess(data)
+      temp.scheduledStartDateTime = temp.scheduledStartDateTime.toString()
+    const params =     {
+      details: temp,
+      previousScheduleDate: dayjs(
+        dayjs(temp.scheduledStartDateTime)
+          .subtract(1, "day")
+          .format("YYYY-MM-DDT11:59:00.000Z")
+      ).toISOString(),
+      startDate: dayjs()
+        .startOf("month")
+        .add(1, "day")
+        .format("YYYY-MM-DDT00:00:00.000Z"),
+      endDate: dayjs()
+        .add(14, "months")
+        .endOf("month")
+        .format("YYYY-MM-DDT00:00:00.000Z"),
+    }
+      const res = findScheduleDateTime(
+        params.details,
+        params.previousScheduleDate,
+        params.startDate,
+        params.endDate
+      )
+      console.log(res)
+  setEvent({ events: { scheduledDateTime: res } as TimexEvent});
+      
+    }
+  catch (error) {
+     console.error("unexpected error from webassemby", error) 
+    }
+    
+
+  // setEvent({ events: res.data });
+
+    
+  }
+  
+  const onSubmitWithApi: SubmitHandler<TInputs> = async (data) => {
     // data.scheduledStartDateTime = typeof data.scheduledStartDateTime === 'date' ? data.scheduledStartDateTime.toISOString() : data.scheduledStartDateTime;
     setLoading(true);
     const temp = preProcess(data)
