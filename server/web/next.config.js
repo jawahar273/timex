@@ -4,7 +4,7 @@ const nextConfig = {
     experimental: {
         typedRoutes: true,
     },
-    output: 'standalone',
+    output: 'export',
 };
 
 module.exports = nextConfig;
