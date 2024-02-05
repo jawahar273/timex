@@ -56,6 +56,9 @@ jobs:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./server/web
         needs: build
         steps:
         - name: Upload Artifact
