@@ -45,7 +45,9 @@ js-asm:
 	wasm-pack build --target web --out-name ${ASM_FILE_NAME} && \
 	cd .. && \
 	rm -rf "${WEB_ASM_PATH}/*" && \
-	cp -a ${ASM_PATH}/pkg/* ${WEB_ASM_PATH}
+	cp -a ${ASM_PATH}/pkg/* ${WEB_ASM_PATH} && \
+	echo "export const VERSION = \"${COMMIT_ID}\"" | cat > "${WEB_ASM_PATH}/version.ts"
+	
 
 ci-install:
 	curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
