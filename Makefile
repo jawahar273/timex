@@ -39,8 +39,6 @@ COMMIT_ID=$(shell git rev-parse --short HEAD)
 ASM_FILE_NAME="asm-${COMMIT_ID}"
 
 js-asm:
-
-	
 	echo "version: ${COMMIT_ID}" && \
 	cd ${ASM_PATH} && \
 	rm -rf "${ASM_PATH}/pkg" && \
