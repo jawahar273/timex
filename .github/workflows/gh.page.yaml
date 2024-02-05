@@ -51,7 +51,7 @@ jobs:
             - name: Install dependencies
               run: npm ci
             - name: Update web assembly
-              run: make js-asm
+              run: pwd && make js-asm
             - name: Build with Next.js
               run: npx next build
             - name: Upload artifact
