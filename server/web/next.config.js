@@ -10,6 +10,5 @@ const nextConfig = {
     // +  assetPrefix = process.env.NEXT_PUBLIC_BASE_PATH || ''
 };
 
-console.log(process.env.NEXT_PUBLIC_BASE_PATH)
 
 module.exports = nextConfig;
