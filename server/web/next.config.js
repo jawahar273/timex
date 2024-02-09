@@ -4,7 +4,11 @@ const nextConfig = {
     experimental: {
         typedRoutes: true,
     },
-    output: 'standalone',
+    output: 'export',
+    assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '/timex',
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/timex',
+    // +  assetPrefix = process.env.NEXT_PUBLIC_BASE_PATH || ''
 };
+
 
 module.exports = nextConfig;

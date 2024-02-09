@@ -30,3 +30,25 @@ pre-release:
 relase:
 	cargo release commit --execute
 	cargo release tag --execute --no-confirm
+
+ASM_PATH="./asm"
+WEB_PATH="./server/web"
+WEB_ASM_PATH="${WEB_PATH}/src/asm"
+
+COMMIT_ID=$(shell git rev-parse --short HEAD)
+ASM_FILE_NAME="asm-${COMMIT_ID}"
+
+js-asm:
+	echo "version: ${COMMIT_ID}" && \
+	cd ${ASM_PATH} && \
+	rm -rf "${ASM_PATH}/pkg" && \
+	wasm-pack build --target web --out-name ${ASM_FILE_NAME} && \
+	cd .. && \
+	rm -rf "${WEB_ASM_PATH}/*" && \
+	cp -a ${ASM_PATH}/pkg/* ${WEB_ASM_PATH} && \
+	echo "export const VERSION = \"${COMMIT_ID}\"" | cat > "${WEB_ASM_PATH}/version.ts"
+	
+
+ci-install:
+	curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+	

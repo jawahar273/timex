@@ -2,9 +2,8 @@ use core::fmt;
 
 use chrono::Weekday;
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::wasm_bindgen;
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub enum RepeatEvery {
@@ -14,7 +13,7 @@ pub enum RepeatEvery {
     Year,
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub enum MonthOptions {
@@ -69,7 +68,7 @@ impl RepeatEvery {
     }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Copy)]
 pub enum EndOption {
     #[serde(rename = "after")]
@@ -103,7 +102,7 @@ impl EndOption {
     }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Copy)]
 pub enum DayCategoryFor {
     #[serde(rename = "first")]
@@ -157,7 +156,7 @@ impl DayCategoryFor {
     }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Copy)]
 /// List of weekday in a week
 pub enum WeekDayForMonth {
@@ -220,7 +219,7 @@ impl WeekDayForMonth {
 
 /// Schedule details contain necessary field to process
 /// and contain to generate scheduled date and time
-#[wasm_bindgen(getter_with_clone)]
+// #[wasm_bindgen(getter_with_clone)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleDetails {

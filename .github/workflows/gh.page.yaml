@@ -1,0 +1,74 @@
+name: deploy to gh page
+on:
+    push:
+        branches:
+            - web-asm
+    pull_request:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+              node-version: [20.x]
+        defaults:
+            run:
+                working-directory: ./server/web
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+            # - name: Change folder location
+            #   id: web-folder
+            #   run: |
+            #      echo "path=./server/web" >> $GITHUB_OUTPUT
+            #      exit 0
+            - name: Setup Node  ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                node-version:  ${{ matrix.node-version }}
+                cache: npm
+                cache-dependency-path: ./server/web
+            - name: Cache dependencies ⚡
+              id: cache_dependencies
+              uses: actions/cache@v3
+              with:
+                  path: node_modules
+                  key: node-modules-${{ hashFiles('package-lock.json') }}
+            - name: Setup Pages
+              uses: actions/configure-pages@v4
+              with:
+              # Automatically inject basePath in your Next.js configuration file and disable
+              # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
+              #
+              # You may remove this line if you want to manage the configuration yourself.
+               static_site_generator: next
+            - name: Install dependencies
+              run: npm ci
+            - name: Update web assembly
+              run: cd ../.. && make ci-install && make js-asm
+            - name: Build with Next.js
+              run: npx next build
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                path: "./server/web/out"
+ 
+    deploy:
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./server/web
+        needs: build
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
