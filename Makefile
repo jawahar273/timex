@@ -22,9 +22,11 @@ init-dep:
 		git-cliff
 	# cargo install flamegraph
 
-pre-release:
+changelog:
 	@test $${version?Please set the version for release}
 	git cliff -o CHANGELOG.md --tag $(version)
+
+pre-release: changelog
 	cargo release version $(version) --execute --no-confirm
 
 relase:
