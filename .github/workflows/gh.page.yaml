@@ -2,8 +2,10 @@ name: deploy to gh page
 on:
     push:
         branches:
-            - web-asm
+            - main 
     pull_request:
+        branches:
+            - main
 
 permissions:
   contents: read
