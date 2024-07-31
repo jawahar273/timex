@@ -1,36 +1,12 @@
 
 # Timex: Schedule Date Time Generator
 
-This Rust library allows you to generate date times based on a start and end date, along with other parameters. It utilizes the chrono crate for date and time manipulations.
+This Rust library enables the generation of date-time schedules based on specified start and end dates, along with configurable intervals. It leverages the chrono crate for robust date and time manipulations.
 
 ## Demo
 
 <https://github.com/jawahar273/timex/assets/7668497/841621b1-6325-4804-8dc3-cb5124c42a96>
 
-For recreated demo check `server/README.md`.
-
-<!--
-## Installation
-
-To install this library, add the following line to your Cargo.toml file under [dependencies] section:
-```rust
-[dependencies]
-timex = "0.0.1"
-
-```
--->
-
-## Feature
-
-- Time range
-- Occurrence
-- Based on daily, weekly, monthly and yearly(soon)..
-- Web assembly support
-
-## Limitation
-
-- Not good with nano second as this project rely on ([`Chrono`](https://docs.rs/chrono/latest/chrono/index.html#limitations)) which has know limitation.
-- Recommenced to use a persistance database to store the schedule date and time.
 
 ## Usage
 
@@ -84,6 +60,32 @@ fn main() {
     // ]
 }
 ```
+
+For recreated demo check `server/README.md`.
+
+<!--
+## Installation
+
+To install this library, add the following line to your Cargo.toml file under [dependencies] section:
+```rust
+[dependencies]
+timex = "0.0.1"
+
+```
+-->
+
+## Feature
+
+- Time range
+- Occurrence
+- Based on daily, weekly, monthly and yearly(soon)..
+- Web assembly support
+
+## Limitation
+
+- Not good with nano second as this project rely on ([`Chrono`](https://docs.rs/chrono/latest/chrono/index.html#limitations)) which has know limitation.
+- Recommenced to use a persistance database to store the schedule date and time.
+
 
 ## License
 
